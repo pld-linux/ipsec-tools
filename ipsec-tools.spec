@@ -75,7 +75,7 @@ PFKeyV2 static library.
 Biblioteka statyczna PFKeyV2.
 
 %prep
-%setup -q -n %{name}-%{version}
+%setup -q
 
 %{__sed} -i 's!@INCLUDE_GLIBC@!!g' src/Makefile.am
 %{__sed} -i 's!<gssapi/gssapi\.h>!"/usr/include/gssapi.h"!' src/racoon/gssapi.h
@@ -141,8 +141,8 @@ fi
 %attr(755,root,root) %{_sbindir}/*
 %attr(754,root,root) /etc/rc.d/init.d/racoon
 %attr(750,root,root) %dir %{_sysconfdir}/racoon
-%config(noreplace) %verify(not mtime md5 size) %{_sysconfdir}/racoon/*.txt
-%config(noreplace) %verify(not mtime md5 size) %{_sysconfdir}/racoon/*.conf
+%config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/racoon/*.txt
+%config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/racoon/*.conf
 %{_mandir}/man[58]/*
 
 %files -n libipsec
