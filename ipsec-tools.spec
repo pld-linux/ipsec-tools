@@ -2,7 +2,7 @@ Summary:	User-space IPsec tools for the Linux IPsec implementation
 Summary(pl):	Narzêdzia przestrzeni u¿ytkownika dla linuksowej implementacji IPsec
 Name:		ipsec-tools
 Version:	0.2.2
-Release:	2
+Release:	3
 License:	BSD
 Group:		Networking/Admin
 Source0:	http://dl.sourceforge.net/%{name}/%{name}-%{version}.tar.gz
@@ -11,6 +11,21 @@ Source1:	%{name}-racoon.init
 Patch0:		%{name}-ac_am.patch
 # Patch1 - remove CAST128 from the default conf
 Patch1:         %{name}-racoon-conf.diff
+# Patch2 - sourceforge req. 797347 - racoon segfaults
+Patch2:         %{name}-fix.patch
+# Patch3 - sourceforge req. 836863 - IPComp fixes
+Patch3:         %{name}-ipcomp.patch
+# Patch4 - sourceforge req. 837924 - sync with KAME 2003-11-06
+Patch4:         %{name}-linux-ipsec-tools.diff-4.patch
+# Patch5 - sourceforge req. 848639 - CRL not checked for OpenSSL 0.9.7
+Patch5:         %{name}-crl-check.patch
+# Patch6 - sourceforge req. 849062 - Update for IPComp incorrectly sending key
+Patch6:         %{name}-ipcomp-libipsec.patch
+# Patch7 - sourceforge req. 849112 - Eliminate delay before beginning phase 2 negotiation
+Patch7:         %{name}-noph2delay.patch
+# Patch8 - sourceforge req. 854376 - Reload handler patch
+Patch8:         %{name}-reload.diff
+
 URL:		http://ipsec-tools.sourceforge.net/
 BuildRequires:	autoconf
 BuildRequires:	automake
@@ -72,6 +87,13 @@ Biblioteka statyczna PFKeyV2.
 %setup -q
 %patch0 -p1
 %patch1 -p1
+%patch2 -p0
+%patch3 -p1
+#%patch4 -p1
+%patch5 -p1
+%patch6 -p1
+%patch7 -p1
+%patch8 -p1
 
 %build
 cd src/racoon
