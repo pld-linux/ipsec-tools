@@ -5,20 +5,17 @@
 Summary:	User-space IPsec tools for the Linux IPsec implementation
 Summary(pl):	Narzêdzia przestrzeni u¿ytkownika dla linuksowej implementacji IPsec
 Name:		ipsec-tools
-Version:	0.2.5
-Release:	1
+Version:	0.3.1
+Release:	0.1
 License:	BSD
 Group:		Networking/Admin
 Source0:	http://dl.sourceforge.net/%{name}/%{name}-%{version}.tar.gz
-# Source0-md5:	cc6c3803c230a19dbbd3679879decd0c
+# Source0-md5:	16612755f96e6453bacdbeff5be72759
 Source1:	%{name}-racoon.init
-Patch0:		%{name}-ac_am.patch
-# remove CAST128 from the default conf
-Patch1:         %{name}-racoon-conf.diff
 # sourceforge req. 849112 - Eliminate delay before beginning phase 2 negotiation
-Patch2:         %{name}-noph2delay.patch
-Patch3:		%{name}-salen.patch
-Patch4:		%{name}-install.patch
+#Patch0:         %{name}-noph2delay.patch
+Patch1:		%{name}-salen.patch
+Patch2:		%{name}-install.patch
 URL:		http://ipsec-tools.sourceforge.net/
 BuildRequires:	autoconf
 BuildRequires:	automake
@@ -82,11 +79,9 @@ Biblioteka statyczna PFKeyV2.
 
 %prep
 %setup -q
-%patch0 -p1
+#%patch0 -p1
 %patch1 -p1
 %patch2 -p1
-%patch3 -p1
-%patch4 -p1
 
 %{__perl} -pi -e 's!include-glibc!!g' src/Makefile.am
 %{__perl} -pi -e 's!<gssapi/gssapi\.h>!"/usr/include/gssapi.h"!' src/racoon/gssapi.h
@@ -106,7 +101,8 @@ cd -
 
 %configure \
 	%{?with_kerberos5:--enable-gssapi} \
-	--with-kernel-headers=/usr/include
+	--with-kernel-headers=/usr/include \
+	--enable-shared
 
 touch src/.includes
 
