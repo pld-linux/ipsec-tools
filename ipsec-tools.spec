@@ -5,7 +5,7 @@ Release:	1
 License:	BSD
 Group:		Networking/Admin
 Source0:	http://dl.sourceforge.net/%{name}/%{name}-%{version}.tar.gz
-# Source0-md5: b5493f7a2997130a4f86c486c9993b86
+# Source0-md5:	c7d6d7b89ffc102041daf6e9615ff9ab
 Source1:	%{name}-racoon.init
 Patch0:		%{name}-ac_am.patch
 URL:		http://ipsec-tools.sourceforge.net/
