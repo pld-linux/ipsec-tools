@@ -6,12 +6,12 @@ Summary:	User-space IPsec tools for the Linux IPsec implementation
 Summary(pl):	Narzêdzia przestrzeni u¿ytkownika dla linuksowej implementacji IPsec
 Name:		ipsec-tools
 Version:	0.5
-%define	_rc	pre20041104
+%define	_rc	rc1
 Release:	0.%{_rc}.1
 License:	BSD
 Group:		Networking/Admin
-Source0:	http://dl.sourceforge.net/%{name}/%{name}-%{version}.%{_rc}.tar.bz2
-# Source0-md5:	914e9091a747ae3365fd8b55b6b27e15
+Source0:	http://dl.sourceforge.net/%{name}/%{name}-%{version}-%{_rc}.tar.bz2
+# Source0-md5:	74fc66f01937076f65079e194dd2b0d0
 Source1:	%{name}-racoon.init
 URL:		http://ipsec-tools.sourceforge.net/
 BuildRequires:	autoconf
@@ -22,7 +22,7 @@ BuildRequires:	flex
 BuildRequires:	libtool
 BuildRequires:	linux-libc-headers >= 7:2.5.54
 BuildRequires:	openssl-devel >= 0.9.7d
-BuildRequires:	perl-base
+BuildRequires:	sed >= 4.0
 Requires:	libipsec = %{version}-%{release}
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 
@@ -75,12 +75,11 @@ PFKeyV2 static library.
 Biblioteka statyczna PFKeyV2.
 
 %prep
-%setup -q -n %{name}-%{version}.%{_rc}
+%setup -q -n %{name}-%{version}-%{_rc}
 
-%{__perl} -pi -e 's!include-glibc!!g' src/Makefile.am
-%{__perl} -pi -e 's!<gssapi/gssapi\.h>!"/usr/include/gssapi.h"!' src/racoon/gssapi.h
-%{__perl} -pi -e 's/-O //' src/racoon/configure.in
-%{__perl} -pi -e 's/-Werror //' configure*
+%{__sed} -i 's!@INCLUDE_GLIBC@!!g' src/Makefile.am
+%{__sed} -i 's!<gssapi/gssapi\.h>!"/usr/include/gssapi.h"!' src/racoon/gssapi.h
+%{__sed} -i 's/-Werror//' configure*
 
 %build
 cd src/racoon
