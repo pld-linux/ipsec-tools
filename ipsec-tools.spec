@@ -32,9 +32,9 @@ do polityki bezpieczeñstwa oraz asocjacyjnej bazy danych
 bezpieczeñstwa.
 
 %package -n libipsec
-Summary:        PFKeyV2 library
+Summary:	PFKeyV2 library
 Summary(pl):	Biblioteka PFKeyV2
-Group:          Libraries
+Group:		Libraries
 
 %description -n libipsec
 PFKeyV2 library.
@@ -43,9 +43,9 @@ PFKeyV2 library.
 Biblioteka PFKeyV2.
 
 %package -n libipsec-devel
-Summary:        PFKeyV2 library - development files
+Summary:	PFKeyV2 library - development files
 Summary(pl):	Pliki nag³ówkowe biblioteki PFKeyV2
-Group:          Development/Libraries
+Group:		Development/Libraries
 Requires:	libipsec = %{version}
 
 %description -n libipsec-devel
@@ -55,9 +55,9 @@ PFKeyV2 library - development files.
 Pliki nag³ówkowe biblioteki PFKeyV2.
 
 %package -n libipsec-static
-Summary:        PFKeyV2 static library
+Summary:	PFKeyV2 static library
 Summary(pl):	Biblioteka statyczna PFKeyV2
-Group:          Development/Libraries
+Group:		Development/Libraries
 Requires:	libipsec = %{version}-devel
 
 %description -n libipsec-static
