@@ -1,0 +1,74 @@
+#!/bin/sh
+#
+# racoon	Internet Key Exchange (IKE) daemon.
+#
+# chkconfig:	345 85 15
+#
+# description:	Internet Key Exchange (IKE) daemon for automatically keying
+#		IPsec connections.
+#
+# $Id$
+
+
+# Source function library
+. /etc/rc.d/init.d/functions
+
+# Get network config
+. /etc/sysconfig/network
+
+# Get service config - may override defaults
+[ -f /etc/sysconfig/racoon ] && . /etc/sysconfig/racoon
+
+# Check that networking is up.
+if is_yes "${NETWORKING}"; then
+	if [ ! -f /var/lock/subsys/network ]; then
+		msg_network_down racoon
+		exit 1
+	fi
+else
+	exit 0
+fi
+
+
+# See how we were called.
+case "$1" in
+  start)
+	# Check if the service is already running?
+	if [ ! -f /var/lock/subsys/racoon ]; then
+		msg_starting racoon
+		daemon racoon
+		RETVAL=$?
+		[ $RETVAL -eq 0 ] && touch /var/lock/subsys/racoon
+	else
+		msg_already_running racoon
+	fi
+	;;
+  stop)
+	if [ -f /var/lock/subsys/racoon ]; then
+		# Stop daemons.
+		msg_stopping racoon
+		killproc racoon
+		rm -f /var/lock/subsys/racoon
+	else
+		msg_not_running racoon
+	fi
+	;;
+  restart)
+	$0 stop
+	$0 start
+	exit $?
+	;;
+  status)
+	status racoon
+	RETVAL=$?
+	;;
+  *)
+	# show "Usage: %s {start|stop|restart|reload|force-reload|status}"
+	msg_usage "$0 {start|stop|restart|status}"
+	exit 3
+esac
+
+exit $RETVAL
+
+# This must be last line !
+# vi:syntax=sh:tw=78:ts=8:sw=4

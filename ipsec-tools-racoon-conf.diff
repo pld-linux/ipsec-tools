@@ -1,0 +1,11 @@
+--- ipsec-tools-0.2.2/src/racoon/samples/racoon.conf.in.orig	2003-11-27 14:11:08.783373384 +0100
++++ ipsec-tools-0.2.2/src/racoon/samples/racoon.conf.in	2003-11-27 14:11:38.102916136 +0100
+@@ -118,7 +118,7 @@
+ {
+ 	pfs_group 1;
+ 	lifetime time 60 sec;
+-	encryption_algorithm 3des, cast128, blowfish 448, des ;
++	encryption_algorithm 3des, blowfish 448, des ;
+ 	authentication_algorithm hmac_sha1, hmac_md5 ;
+ 	compression_algorithm deflate ;
+ }
