@@ -94,17 +94,17 @@ rm -rf $RPM_BUILD_ROOT
 %post
 /sbin/chkconfig --add racoon
 if [ -f /var/lock/subsys/racoon ]; then
-        /etc/rc.d/init.d/racoon restart 1>&2
+	/etc/rc.d/init.d/racoon restart 1>&2
 else
-        echo "Type \"/etc/rc.d/init.d/racoon start\" to start racoon." 1>&2
+	echo "Type \"/etc/rc.d/init.d/racoon start\" to start racoon." 1>&2
 fi
 
 %preun
 if [ "$1" = "0" ]; then
-        if [ -f /var/lock/subsys/racoon ]; then
-                /etc/rc.d/init.d/racoon stop >&2
-        fi
-        /sbin/chkconfig --del racoon
+	if [ -f /var/lock/subsys/racoon ]; then
+		/etc/rc.d/init.d/racoon stop >&2
+	fi
+	/sbin/chkconfig --del racoon
 fi
 
 %post	-n libipsec -p /sbin/ldconfig
