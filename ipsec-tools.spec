@@ -1,16 +1,16 @@
 #
 # Conditional build:
-%bcond_without	kerberos	# build without GSSAPI support
+%bcond_without	kerberos5	# build without GSSAPI support
 #
 Summary:	User-space IPsec tools for the Linux IPsec implementation
 Summary(pl):	Narzêdzia przestrzeni u¿ytkownika dla linuksowej implementacji IPsec
 Name:		ipsec-tools
-Version:	0.2.4
+Version:	0.2.5
 Release:	1
 License:	BSD
 Group:		Networking/Admin
 Source0:	http://dl.sourceforge.net/%{name}/%{name}-%{version}.tar.gz
-# Source0-md5:	c26b497c34f661b10f3f5a63b9326e4f
+# Source0-md5:	cc6c3803c230a19dbbd3679879decd0c
 Source1:	%{name}-racoon.init
 Patch0:		%{name}-ac_am.patch
 # remove CAST128 from the default conf
@@ -24,7 +24,7 @@ BuildRequires:	autoconf
 BuildRequires:	automake
 BuildRequires:	bison
 BuildRequires:	flex
-%{?with_kerberos:BuildRequires:	heimdal-devel}
+%{?with_kerberos5:BuildRequires:	heimdal-devel}
 BuildRequires:	libtool
 BuildRequires:	linux-libc-headers >= 7:2.5.54
 BuildRequires:	openssl-devel >= 0.9.7d
@@ -105,7 +105,7 @@ cd -
 %{__automake}
 
 %configure \
-	%{?with_kerberos:--enable-gssapi} \
+	%{?with_kerberos5:--enable-gssapi} \
 	--with-kernel-headers=/usr/include
 
 touch src/.includes
