@@ -5,17 +5,14 @@
 Summary:	User-space IPsec tools for the Linux IPsec implementation
 Summary(pl):	Narzêdzia przestrzeni u¿ytkownika dla linuksowej implementacji IPsec
 Name:		ipsec-tools
-Version:	0.3.3
-Release:	0.1
+Version:	0.5
+%define	_rc	pre20041104
+Release:	0.%{_rc}.1
 License:	BSD
 Group:		Networking/Admin
-Source0:	http://dl.sourceforge.net/%{name}/%{name}-%{version}.tar.gz
-# Source0-md5:	b141da8ae299c8fdc53e536f6bbc3ad0
+Source0:	http://dl.sourceforge.net/%{name}/%{name}-%{version}.%{_rc}.tar.bz2
+# Source0-md5:	914e9091a747ae3365fd8b55b6b27e15
 Source1:	%{name}-racoon.init
-# sourceforge req. 849112 - Eliminate delay before beginning phase 2 negotiation
-#Patch0:         %{name}-noph2delay.patch
-Patch1:		%{name}-salen.patch
-Patch2:		%{name}-install.patch
 URL:		http://ipsec-tools.sourceforge.net/
 BuildRequires:	autoconf
 BuildRequires:	automake
@@ -78,44 +75,37 @@ PFKeyV2 static library.
 Biblioteka statyczna PFKeyV2.
 
 %prep
-%setup -q
-#%patch0 -p1
-%patch1 -p1
-%patch2 -p1
+%setup -q -n %{name}-%{version}.%{_rc}
 
 %{__perl} -pi -e 's!include-glibc!!g' src/Makefile.am
 %{__perl} -pi -e 's!<gssapi/gssapi\.h>!"/usr/include/gssapi.h"!' src/racoon/gssapi.h
 %{__perl} -pi -e 's/-O //' src/racoon/configure.in
+%{__perl} -pi -e 's/-Werror //' configure*
 
 %build
 cd src/racoon
 install /usr/share/automake/config.* .
-%{__aclocal}
-%{__autoconf}
 cd -
-%{__libtoolize}
-%{__aclocal}
-%{__autoconf}
-%{__autoheader}
-%{__automake}
 
 %configure \
 	%{?with_kerberos5:--enable-gssapi} \
 	--with-kernel-headers=/usr/include \
+	--enable-rc5 \
+	--enable-idea \
+	--enable-ipv6 \
 	--enable-shared
-
-touch src/.includes
 
 %{__make}
 
 %install
 rm -rf $RPM_BUILD_ROOT
-install -d $RPM_BUILD_ROOT/etc/rc.d/init.d
+install -d $RPM_BUILD_ROOT/etc/{rc.d/init.d,racoon}
 
 %{__make} install \
 	DESTDIR=$RPM_BUILD_ROOT
 
 install %{SOURCE1} $RPM_BUILD_ROOT/etc/rc.d/init.d/racoon
+install src/racoon/samples/*.txt src/racoon/samples/*.conf $RPM_BUILD_ROOT/etc/racoon
 
 %clean
 rm -rf $RPM_BUILD_ROOT
