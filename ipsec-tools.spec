@@ -101,7 +101,9 @@ install %{_datadir}/automake/config.* .
 %{__aclocal}
 %{__autoconf}
 cd -
-%configure
+%configure \
+	%{?_without_dist_kernel:--with-kernel-headers=/usr/src/linux/include/}
+
 %{__make}
 
 %install
