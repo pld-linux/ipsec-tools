@@ -1,0 +1,14 @@
+--- ipsec-tools-0.2.4/src/racoon/gssapi.c.orig	Wed Feb 26 22:31:07 2003
++++ ipsec-tools-0.2.4/src/racoon/gssapi.c	Tue Mar  2 11:49:39 2004
+@@ -139,7 +139,10 @@
+ 
+ 	sa = remote ? iph1->remote : iph1->local;
+ 
+-	if (getnameinfo(sa, sa->sa_len, name, NI_MAXHOST, NULL, 0, 0) != 0)
++	if (getnameinfo(sa, (sa->sa_family == PF_INET6) ?
++			sizeof(struct sockaddr_in6) : 
++			sizeof(struct sockaddr_in), 
++			name, NI_MAXHOST, NULL, 0, 0) != 0)
+ 		return -1;
+ 
+ 	name_token.length = asprintf((char **)&name_token.value,
