@@ -5,12 +5,12 @@
 Summary:	User-space IPsec tools for the Linux IPsec implementation
 Summary(pl):	Narzêdzia przestrzeni u¿ytkownika dla linuksowej implementacji IPsec
 Name:		ipsec-tools
-Version:	0.3.2
+Version:	0.3.3
 Release:	0.1
 License:	BSD
 Group:		Networking/Admin
 Source0:	http://dl.sourceforge.net/%{name}/%{name}-%{version}.tar.gz
-# Source0-md5:	c2e444ad898b357dfab4ae959da84f60
+# Source0-md5:	b141da8ae299c8fdc53e536f6bbc3ad0
 Source1:	%{name}-racoon.init
 # sourceforge req. 849112 - Eliminate delay before beginning phase 2 negotiation
 #Patch0:         %{name}-noph2delay.patch
