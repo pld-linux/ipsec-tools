@@ -1,0 +1,94 @@
+--- ipsec-tools-0.2.2.orig/src/racoon/handler.c	2003-02-27 20:06:40.000000000 -0800
++++ ipsec-tools-0.2.2.nodelay/src/racoon/handler.c	2003-11-25 08:55:04.661509181 -0800
+@@ -318,6 +318,30 @@
+ 
+ /* %%% management phase 2 handler */
+ /*
++ * start the phase 2 negotiation for all of them that use the phase 1 
++ * handler passed in
++ */
++void
++startph2byph1(iph1)
++	struct ph1handle *iph1;
++{
++	struct ph2handle *p;
++	struct ph1handle *ph1;
++
++	LIST_FOREACH(p, &ph2tree, chain) {
++		ph1 = getph1byaddr (p->src, p->dst);
++		if (ph1 != NULL && 
++		    cmpsaddrwop (iph1->local, ph1->local) == 0 &&
++		    cmpsaddrwop (iph1->remote,ph1->remote) == 0
++		    && p->status < PHASE2ST_GETSPISENT) {
++			sched_scrub_param (p);
++			plog (LLV_DEBUG, LOCATION, NULL, "staring phase 2 right away\n");
++			isakmp_ph2begin_i (iph1, p);
++		}
++	}
++}
++
++/*
+  * search ph2handle with policy id.
+  */
+ struct ph2handle *
+diff -aru ipsec-tools-0.2.2.orig/src/racoon/handler.h ipsec-tools-0.2.2.nodelay/src/racoon/handler.h
+--- ipsec-tools-0.2.2.orig/src/racoon/handler.h	2003-03-03 15:30:40.000000000 -0800
++++ ipsec-tools-0.2.2.nodelay/src/racoon/handler.h	2003-11-25 08:49:15.508134748 -0800
+@@ -420,3 +420,5 @@
+ extern int add_recvdpkt __P((struct sockaddr *, struct sockaddr *,
+ 	vchar_t *, vchar_t *));
+ extern void init_recvdpkt __P((void));
++
++extern void startph2byph1 __P((struct ph1handle *));
+diff -aru ipsec-tools-0.2.2.orig/src/racoon/isakmp_agg.c ipsec-tools-0.2.2.nodelay/src/racoon/isakmp_agg.c
+--- ipsec-tools-0.2.2.orig/src/racoon/isakmp_agg.c	2003-02-26 13:31:15.000000000 -0800
++++ ipsec-tools-0.2.2.nodelay/src/racoon/isakmp_agg.c	2003-11-25 08:39:56.202598600 -0800
+@@ -588,6 +588,8 @@
+ 
+ 	iph1->status = PHASE1ST_ESTABLISHED;
+ 
++	startph2byph1 (iph1);
++
+ 	error = 0;
+ 
+ end:
+diff -aru ipsec-tools-0.2.2.orig/src/racoon/isakmp.c ipsec-tools-0.2.2.nodelay/src/racoon/isakmp.c
+--- ipsec-tools-0.2.2.orig/src/racoon/isakmp.c	2003-03-03 15:56:56.000000000 -0800
++++ ipsec-tools-0.2.2.nodelay/src/racoon/isakmp.c	2003-11-25 08:41:20.066081337 -0800
+@@ -142,7 +142,6 @@
+ static int quick_main __P((struct ph2handle *, vchar_t *));
+ static int isakmp_ph1begin_r __P((vchar_t *,
+ 	struct sockaddr *, struct sockaddr *, u_int8_t));
+-static int isakmp_ph2begin_i __P((struct ph1handle *, struct ph2handle *));
+ static int isakmp_ph2begin_r __P((struct ph1handle *, vchar_t *));
+ static int etypesw1 __P((int));
+ static int etypesw2 __P((int));
+@@ -927,7 +926,7 @@
+ }
+ 
+ /* new negotiation of phase 2 for initiator */
+-static int
++int
+ isakmp_ph2begin_i(iph1, iph2)
+ 	struct ph1handle *iph1;
+ 	struct ph2handle *iph2;
+diff -aru ipsec-tools-0.2.2.orig/src/racoon/isakmp.h ipsec-tools-0.2.2.nodelay/src/racoon/isakmp.h
+--- ipsec-tools-0.2.2.orig/src/racoon/isakmp.h	2003-02-26 13:31:14.000000000 -0800
++++ ipsec-tools-0.2.2.nodelay/src/racoon/isakmp.h	2003-11-25 08:49:52.493938722 -0800
+@@ -346,3 +346,4 @@
+ 	/* SPI(es) */
+ } __attribute__((__packed__));
+ 
++int isakmp_ph2begin_i __P((struct ph1handle *, struct ph2handle *));
+diff -aru ipsec-tools-0.2.2.orig/src/racoon/isakmp_ident.c ipsec-tools-0.2.2.nodelay/src/racoon/isakmp_ident.c
+--- ipsec-tools-0.2.2.orig/src/racoon/isakmp_ident.c	2003-02-26 13:31:16.000000000 -0800
++++ ipsec-tools-0.2.2.nodelay/src/racoon/isakmp_ident.c	2003-11-25 08:39:56.198599054 -0800
+@@ -703,6 +703,8 @@
+ 
+ 	iph1->status = PHASE1ST_ESTABLISHED;
+ 
++	startph2byph1 (iph1);
++
+ 	error = 0;
+ 
+ end:
