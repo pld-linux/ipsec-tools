@@ -2,13 +2,15 @@ Summary:	User-space IPsec tools for the Linux IPsec implementation
 Summary(pl):	Narzêdzia przestrzeni u¿ytkownika dla linuksowej implementacji IPsec
 Name:		ipsec-tools
 Version:	0.2.2
-Release:	1
+Release:	2
 License:	BSD
 Group:		Networking/Admin
 Source0:	http://dl.sourceforge.net/%{name}/%{name}-%{version}.tar.gz
 # Source0-md5:	c7d6d7b89ffc102041daf6e9615ff9ab
 Source1:	%{name}-racoon.init
 Patch0:		%{name}-ac_am.patch
+# Patch1 - remove CAST128 from the default conf
+Patch1:         %{name}-racoon-conf.diff
 URL:		http://ipsec-tools.sourceforge.net/
 BuildRequires:	autoconf
 BuildRequires:	automake
@@ -58,7 +60,7 @@ Pliki nag³ówkowe biblioteki PFKeyV2.
 Summary:	PFKeyV2 static library
 Summary(pl):	Biblioteka statyczna PFKeyV2
 Group:		Development/Libraries
-Requires:	libipsec = %{version}-devel
+Requires:	libipsec-devel = %{version}
 
 %description -n libipsec-static
 PFKeyV2 static library.
@@ -69,6 +71,7 @@ Biblioteka statyczna PFKeyV2.
 %prep
 %setup -q
 %patch0 -p1
+%patch1 -p1
 
 %build
 cd src/racoon
