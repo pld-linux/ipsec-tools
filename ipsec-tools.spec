@@ -6,12 +6,12 @@ Summary:	User-space IPsec tools for the Linux IPsec implementation
 Summary(pl):	Narzêdzia przestrzeni u¿ytkownika dla linuksowej implementacji IPsec
 Name:		ipsec-tools
 Version:	0.5
-%define	_rc	rc1
+%define	_rc	rc2
 Release:	0.%{_rc}.1
 License:	BSD
 Group:		Networking/Admin
-Source0:	http://dl.sourceforge.net/%{name}/%{name}-%{version}-%{_rc}.tar.bz2
-# Source0-md5:	74fc66f01937076f65079e194dd2b0d0
+Source0:	http://dl.sourceforge.net/%{name}/%{name}-%{version}%{_rc}.tar.bz2
+# Source0-md5:	16cc2cea0a882c8df1da1393011d9cbe
 Source1:	%{name}-racoon.init
 URL:		http://ipsec-tools.sourceforge.net/
 BuildRequires:	autoconf
@@ -75,11 +75,11 @@ PFKeyV2 static library.
 Biblioteka statyczna PFKeyV2.
 
 %prep
-%setup -q -n %{name}-%{version}-%{_rc}
+%setup -q -n %{name}-%{version}%{_rc}
 
 %{__sed} -i 's!@INCLUDE_GLIBC@!!g' src/Makefile.am
 %{__sed} -i 's!<gssapi/gssapi\.h>!"/usr/include/gssapi.h"!' src/racoon/gssapi.h
-%{__sed} -i 's/-Werror//' configure*
+#%{__sed} -i 's/-Werror//' configure*
 
 %build
 cd src/racoon
