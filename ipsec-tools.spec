@@ -27,7 +27,7 @@ BuildRequires:	flex
 %{?with_kerberos:BuildRequires:	heimdal-devel}
 BuildRequires:	libtool
 BuildRequires:	linux-libc-headers >= 7:2.5.54
-BuildRequires:	openssl-devel
+BuildRequires:	openssl-devel >= 0.9.7d
 BuildRequires:	perl-base
 Requires:	libipsec = %{version}-%{release}
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
