@@ -1,17 +1,17 @@
 #
 # Conditional build:
-%bcond_without	kerberos5	# build without GSSAPI support
+%bcond_with	kerberos5	# build with GSSAPI support
 #
 Summary:	User-space IPsec tools for the Linux IPsec implementation
 Summary(pl):	Narzêdzia przestrzeni u¿ytkownika dla linuksowej implementacji IPsec
 Name:		ipsec-tools
 Version:	0.5
-%define	_rc	rc2
-Release:	0.%{_rc}.1
+#%define	_rc	rc2
+Release:	0.1
 License:	BSD
 Group:		Networking/Admin
-Source0:	http://dl.sourceforge.net/%{name}/%{name}-%{version}%{_rc}.tar.bz2
-# Source0-md5:	16cc2cea0a882c8df1da1393011d9cbe
+Source0:	http://dl.sourceforge.net/%{name}/%{name}-%{version}.tar.bz2
+# Source0-md5:	5447480467377ef8f7b9fda109ff2877
 Source1:	%{name}-racoon.init
 URL:		http://ipsec-tools.sourceforge.net/
 BuildRequires:	autoconf
@@ -75,24 +75,31 @@ PFKeyV2 static library.
 Biblioteka statyczna PFKeyV2.
 
 %prep
-%setup -q -n %{name}-%{version}%{_rc}
+%setup -q -n %{name}-%{version}
 
 %{__sed} -i 's!@INCLUDE_GLIBC@!!g' src/Makefile.am
 %{__sed} -i 's!<gssapi/gssapi\.h>!"/usr/include/gssapi.h"!' src/racoon/gssapi.h
 #%{__sed} -i 's/-Werror//' configure*
 
 %build
-cd src/racoon
-install /usr/share/automake/config.* .
-cd -
+%{__libtoolize}
+%{__aclocal} -I .
+%{__autoconf}
+%{__autoheader}
+%{__automake}
 
 %configure \
 	%{?with_kerberos5:--enable-gssapi} \
 	--with-kernel-headers=/usr/include \
-	--enable-rc5 \
+	--enable-dpd \
+	--enable-frag \
+	--enable-hybrid \
 	--enable-idea \
 	--enable-ipv6 \
-	--enable-shared
+        --enable-natt \
+        --enable-natt-versions \
+	--enable-rc5 \
+	--enable-shared 
 
 %{__make}
 
