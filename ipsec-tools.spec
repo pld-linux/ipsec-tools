@@ -139,7 +139,7 @@ fi
 %defattr(644,root,root,755)
 %doc NEWS README ChangeLog
 %attr(755,root,root) %{_sbindir}/*
-%attr(754,root,root) %{_sysconfdir}/rc.d/init.d/racoon
+%attr(754,root,root) /etc/rc.d/init.d/racoon
 %attr(750,root,root) %dir %{_sysconfdir}/racoon
 %config(noreplace) %verify(not mtime md5 size) %{_sysconfdir}/racoon/*.txt
 %config(noreplace) %verify(not mtime md5 size) %{_sysconfdir}/racoon/*.conf
