@@ -1,6 +1,8 @@
-%bcond_without dist_kernel # use installed kernel
-%bcond_without kerberos    # use GSSAPI
-
+#
+# Conditional build:
+%bcond_with kerberos		# build without GSSAPI support
+# (doesn't build now, sa_len issue)
+#
 Summary:	User-space IPsec tools for the Linux IPsec implementation
 Summary(pl):	Narzêdzia przestrzeni u¿ytkownika dla linuksowej implementacji IPsec
 Name:		ipsec-tools
@@ -28,17 +30,17 @@ Patch6:         %{name}-ipcomp-libipsec.patch
 Patch7:         %{name}-noph2delay.patch
 # Patch8 - sourceforge req. 854376 - Reload handler patch
 Patch8:         %{name}-reload.diff
-
 URL:		http://ipsec-tools.sourceforge.net/
 BuildRequires:	autoconf
 BuildRequires:	automake
 BuildRequires:	bison
 BuildRequires:	flex
-BuildRequires:	perl
+%{?with_kerberos:BuildRequires:	heimdal-devel}
+BuildRequires:	libtool
+BuildRequires:	linux-libc-headers >= 7:2.5.54
 BuildRequires:	openssl-devel
-%{!?_with_dist_kernel:BuildRequires:	kernel-headers >= 2.5.54}
-%{!?_with_kerberos:BuildRequires:	heimdal-devel}
-Requires:	libipsec = %{version}
+BuildRequires:	perl-base
+Requires:	libipsec = %{version}-%{release}
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 
 %description
@@ -69,7 +71,7 @@ Biblioteka PFKeyV2.
 Summary:	PFKeyV2 library - development files
 Summary(pl):	Pliki nag³ówkowe biblioteki PFKeyV2
 Group:		Development/Libraries
-Requires:	libipsec = %{version}
+Requires:	libipsec = %{version}-%{release}
 
 %description -n libipsec-devel
 PFKeyV2 library - development files.
@@ -81,7 +83,7 @@ Pliki nag³ówkowe biblioteki PFKeyV2.
 Summary:	PFKeyV2 static library
 Summary(pl):	Biblioteka statyczna PFKeyV2
 Group:		Development/Libraries
-Requires:	libipsec-devel = %{version}
+Requires:	libipsec-devel = %{version}-%{release}
 
 %description -n libipsec-static
 PFKeyV2 static library.
@@ -101,18 +103,24 @@ Biblioteka statyczna PFKeyV2.
 %patch7 -p1
 %patch8 -p1
 
+%{__perl} -pi -e 's!include-glibc!!g' src/Makefile.am
+%{__perl} -pi -e 's!<gssapi/gssapi\.h>!"/usr/include/gssapi.h"!' src/racoon/gssapi.h
+
 %build
-perl -pi -e 's!include-glibc!!g' src/Makefile.am
-
 cd src/racoon
-install %{_datadir}/automake/config.* .
-
+install /usr/share/automake/config.* .
 %{__aclocal}
 %{__autoconf}
 cd -
+%{__libtoolize}
+%{__aclocal}
+%{__autoconf}
+%{__autoheader}
+%{__automake}
 
 %configure \
-	%{!?_with_dist_kernel:--with-kernel-headers=/usr/src/linux/include}
+	%{?with_kerberos:--enable-gssapi} \
+	--with-kernel-headers=/usr/include
 
 touch src/.includes
 
