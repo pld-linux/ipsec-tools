@@ -1,4 +1,5 @@
 %bcond_without dist_kernel # use installed kernel
+%bcond_without kerberos    # use GSSAPI
 
 Summary:	User-space IPsec tools for the Linux IPsec implementation
 Summary(pl):	Narzêdzia przestrzeni u¿ytkownika dla linuksowej implementacji IPsec
@@ -34,7 +35,9 @@ BuildRequires:	automake
 BuildRequires:	bison
 BuildRequires:	flex
 BuildRequires:	perl
+BuildRequires:	openssl-devel
 %{!?_with_dist_kernel:BuildRequires:	kernel-headers >= 2.5.54}
+%{!?_with_kerberos:BuildRequires:	heimdal-devel}
 Requires:	libipsec = %{version}
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 
