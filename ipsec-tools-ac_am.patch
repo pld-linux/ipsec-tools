@@ -1,0 +1,291 @@
+diff -urN ipsec-tools-0.2.2.org/src/racoon/configure.in ipsec-tools-0.2.2/src/racoon/configure.in
+--- ipsec-tools-0.2.2.org/src/racoon/configure.in	2003-07-12 01:20:51.631425000 +0200
++++ ipsec-tools-0.2.2/src/racoon/configure.in	2003-07-12 01:22:45.830064168 +0200
+@@ -1,7 +1,7 @@
+-dnl Process this file with autoconf to produce a configure script.
++
+ AC_INIT(admin.c)
+ 
+-dnl Checks for programs.
++
+ AC_PROG_CC
+ AC_PROG_CPP
+ AC_PROG_LEX
+@@ -136,7 +136,7 @@
+ 
+ AC_MSG_CHECKING(if you have KAME tcpdump in $srcdir/../tcpdump)
+ if test -f "$srcdir/../tcpdump/print-isakmp.c"; then
+-	LIBOBJS="$LIBOBJS print-isakmp.o"
++	AC_LIBOBJ([print-isakmp])
+ 	AC_DEFINE(HAVE_PRINT_ISAKMP_C)
+ 	AC_MSG_RESULT(yes)
+ else
+@@ -144,14 +144,14 @@
+ fi
+ 
+ AC_MSG_CHECKING(if __func__ is available)
+-AC_TRY_COMPILE(dnl
++AC_TRY_COMPILE(
+ [#include <stdio.h>
+ ], [char *x = __func__;],
+ 	[AC_DEFINE(HAVE_FUNC_MACRO)
+ 	AC_MSG_RESULT(yes)],
+ 	[AC_MSG_RESULT(no)])
+ 
+-dnl Checks for libraries.
++
+ AC_MSG_CHECKING([whether to enable ipv6])
+ AC_ARG_ENABLE(ipv6,
+ [  --enable-ipv6           Enable ipv6 (with ipv4) support
+@@ -198,8 +198,8 @@
+ 		ipv6trylibc=no
+ 		case $i in
+ 		inria)
+-			dnl http://www.kame.net/
+-			AC_EGREP_CPP(yes, [dnl
++			
++			AC_EGREP_CPP(yes, [
+ #include <netinet/in.h>
+ #ifdef IPV6_INRIA_VERSION
+ yes
+@@ -211,8 +211,8 @@
+ 				CPPFLAGS="-DINET6 $CPPFLAGS"])
+ 			;;
+ 		kame)
+-			dnl http://www.kame.net/
+-			AC_EGREP_CPP(yes, [dnl
++			
++			AC_EGREP_CPP(yes, [
+ #include <netinet/in.h>
+ #ifdef __KAME__
+ yes
+@@ -224,7 +224,7 @@
+ 				CPPFLAGS="-DINET6 $CPPFLAGS"])
+ 			;;
+ 		linux)
+-			dnl http://www.v6.linux.or.jp/
++			
+ 			if test -d /usr/inet6; then
+ 				ipv6type=$i
+ 				ipv6lib=inet6
+@@ -240,7 +240,7 @@
+ 			fi
+ 			;;
+ 		toshiba)
+-			AC_EGREP_CPP(yes, [dnl
++			AC_EGREP_CPP(yes, [
+ #include <sys/param.h>
+ #ifdef _TOSHIBA_INET6
+ yes
+@@ -251,7 +251,7 @@
+ 				CPPFLAGS="-DINET6 $CPPFLAGS"])
+ 			;;
+ 		v6d)
+-			AC_EGREP_CPP(yes, [dnl
++			AC_EGREP_CPP(yes, [
+ #include </usr/local/v6/include/sys/v6config.h>
+ #ifdef __V6D__
+ yes
+@@ -262,7 +262,7 @@
+ 				CPPFLAGS="-I/usr/local/v6/include $CPPFLAGS"])
+ 			;;
+ 		zeta)
+-			AC_EGREP_CPP(yes, [dnl
++			AC_EGREP_CPP(yes, [
+ #include <sys/param.h>
+ #ifdef _ZETA_MINAMI_INET6
+ yes
+@@ -298,7 +298,7 @@
+ 
+ if test "$ipv6" = "yes"; then
+ 	AC_MSG_CHECKING(for advanced API support)
+-	AC_CACHE_VAL(racoon_cv_advapi, [dnl
++	AC_CACHE_VAL(racoon_cv_advapi, [
+ 	AC_TRY_COMPILE([#ifndef INET6
+ #define INET6
+ #endif
+@@ -422,16 +422,16 @@
+ 	[crypto_dir=$withval])
+ AC_MSG_RESULT(${crypto_dir-"default"})
+ 
+-dnl if test "$crypto_dir" != "default"; then
+-dnl 	LIBS="-L$crypto_dir/lib $LIBS"
+-dnl 	if test -f $crypto_dir/include/md5.h; then
+-dnl 		CFLAGS="-I$crypto_dir/include $CFLAGS"
+-dnl 	elif test -d $crypto_dir/include/ssleay -a -f $dir/include/ssleay/md5.h; then
+-dnl 		CFLAGS="-I$crypto_dir/include/ssleay -I$crypto_dir/include $CFLAGS"
+-dnl 	elif test -d $crypto_dir/include/openssl -a -f $dir/include/openssl/md5.h; then
+-dnl 		CFLAGS="-I$crypto_dir/include/openssl -I$crypto_dir/include $CFLAGS"
+-dnl 	fi
+-dnl fi
++
++
++
++
++
++
++
++
++
++
+ 
+ if test "x$crypto_dir" = "x"; then
+ 	case $host_os in
+@@ -482,8 +482,8 @@
+ 		;;
+ 	esac
+ fi
+-dnl for some reason, past version of freebsd port requires us to set -I for
+-dnl BOTH openssl/cast.h and cast.h.  who should I blame (or am I mistaken?)
++
++
+ RACOON_PATH_LIBS(CAST_cfb64_encrypt, crypto, ${crypto_dir}/lib)
+ AC_TRY_COMPILE([#include <sys/types.h>
+ #include <stdio.h>
+@@ -508,7 +508,7 @@
+ 	echo http://www.openssl.org/
+ 	exit 1
+ fi
+-dnl AC_MSG_RESULT("$ssleay_lib and $ssleay_include")
++
+ 
+ AC_MSG_CHECKING(openssl version)
+ AC_EGREP_CPP(yes, [#include <openssl/opensslv.h>
+@@ -519,16 +519,16 @@
+ 	echo "FATAL: OpenSSL version must be 0.9.4 or higher."
+ 	exit 1])
+ 
+-dnl AC_MSG_CHECKING(for libssl)
++
+ AC_CHECK_LIB(ssl, ssl_ok, [], [], -lcrypto)
+ 
+ AC_CHECK_LIB(crypto, des_cbc_encrypt)
+ AC_CHECK_LIB(l, yywrap)
+ AC_CHECK_LIB(y, yyerror)
+ 
+-dnl PF_KEYv2 support check
++
+ AC_MSG_CHECKING(for PF_KEYv2 support)
+-AC_CACHE_VAL(ac_cv_pfkey, [dnl
++AC_CACHE_VAL(ac_cv_pfkey, [
+ AC_TRY_COMPILE([
+ #include <sys/types.h>
+ #include <sys/socket.h>
+@@ -540,7 +540,7 @@
+         OPTFLAG="-DHAVE_PFKEYV2 $OPTFLAG"
+ fi
+ 
+-dnl old KAME header check
++
+ if test "$ac_cv_pfkey" = "yes"; then
+ 	AC_MSG_CHECKING(for old KAME PF_KEYv2 header file)
+ 	AC_TRY_COMPILE([
+@@ -578,8 +578,8 @@
+ 	ipsectrylibc=no
+ 	case $i in
+ 	inria)
+-		dnl http://www.kame.net/
+-		AC_EGREP_CPP(yes, [dnl
++		
++		AC_EGREP_CPP(yes, [
+ #include <netinet/in.h>
+ #ifdef IPV6_INRIA_VERSION
+ yes
+@@ -589,8 +589,8 @@
+ 			ipseclibdir=/usr/lib])
+ 		;;
+ 	kame)
+-		dnl http://www.kame.net/
+-		AC_EGREP_CPP(yes, [dnl
++		
++		AC_EGREP_CPP(yes, [
+ #include <netinet/in.h>
+ #ifdef __KAME__
+ yes
+@@ -600,7 +600,7 @@
+ 			ipseclibdir=/usr/local/v6/lib])
+ 		;;
+ 	linux)
+-		AC_EGREP_CPP(yes, [dnl
++		AC_EGREP_CPP(yes, [
+ #include <netinet/in.h>
+ #ifdef __linux__
+ yes
+@@ -650,7 +650,7 @@
+ fi
+ AC_CHECK_FUNCS(getrrsetbyname)
+ 
+-dnl Checks for header files.
++
+ AC_HEADER_STDC
+ AC_HEADER_SYS_WAIT
+ AC_CHECK_HEADERS(limits.h sys/time.h unistd.h stdarg.h varargs.h)
+@@ -674,35 +674,35 @@
+ fi
+ AC_CHECK_HEADERS(openssl/cversion.h openssl/opensslv.h)
+ 
+-dnl checking rijndael
++
+ AC_SUBST(CRYPTOBJS)
+ AC_CHECK_HEADER(openssl/rijndael.h, [], [
+ 	CPPFLAGS="$CPPFLAGS -I${srcdir}/missing"
+ 	CRYPTOBJS="$CRYPTOBJS rijndael-api-fst.o rijndael-alg-fst.o"
+ ])
+ 
+-dnl checking sha2
++
+ AC_SUBST(CRYPTOBJS)
+ AC_CHECK_HEADER(openssl/sha2.h, [], [
+ 	CPPFLAGS="$CPPFLAGS -I${srcdir}/missing"
+ 	CRYPTOBJS="$CRYPTOBJS sha2.o"
+ ])
+ 
+-dnl Checks for typedefs, structures, and compiler characteristics.
++
+ AC_C_CONST
+ AC_TYPE_PID_T
+ AC_TYPE_SIZE_T
+ AC_HEADER_TIME
+ AC_STRUCT_TM
+ 
+-dnl Checks for library functions.
++
+ AC_FUNC_MEMCMP
+ AC_TYPE_SIGNAL
+ AC_FUNC_VPRINTF
+ AC_CHECK_FUNCS(gettimeofday select socket strerror strtol strtoul strlcpy)
+ AC_REPLACE_FUNCS(strdup)
+ 
+-dnl expand ${sysconfdir}, ugly...
++
+ if test "x$prefix" = xNONE; then
+ 	sysconfdir_x=`echo $sysconfdir | sed -e 's,${prefix},'"$ac_default_prefix,"`
+ else
+@@ -711,13 +711,13 @@
+ fi
+ AC_SUBST(sysconfdir_x)
+ 
+-dnl Checks for getifaddrs
++
+ AC_CHECK_FUNCS(getifaddrs)
+ 
+-dnl Checks for arc4random
++
+ AC_REPLACE_FUNCS(arc4random)
+ 
+-dnl defines package version
++
+ AC_MSG_CHECKING(if --with-pkgversion option is specified)
+ AC_ARG_WITH(pkgversion, [  --with-pkgversion=VERSION   specify package version],
+ 	[AC_MSG_RESULT($withval)
+@@ -725,8 +725,8 @@
+ 	[AC_MSG_RESULT(no)
+ 	pkgversion=no])
+ 
+-dnl this is gross, but we need to invoke either AC_CHECK LIB or AC_CHECK_FUNCS.
+-dnl moved later because on linux this library doesn't exist yet!
++
++
+ if test "$ipseclib" != "none"; then
+    if test "$ipsectype" != "linux"; then
+ 	if test "$ipseclibdir" != "none"; then
