@@ -1,3 +1,5 @@
+%bcond_without dist_kernel # use installed kernel
+
 Summary:	User-space IPsec tools for the Linux IPsec implementation
 Summary(pl):	Narzêdzia przestrzeni u¿ytkownika dla linuksowej implementacji IPsec
 Name:		ipsec-tools
@@ -31,7 +33,8 @@ BuildRequires:	autoconf
 BuildRequires:	automake
 BuildRequires:	bison
 BuildRequires:	flex
-%{!?_without_dist_kernel:BuildRequires:	kernel-headers >= 2.5.54}
+BuildRequires:	perl
+%{!?_with_dist_kernel:BuildRequires:	kernel-headers >= 2.5.54}
 Requires:	libipsec = %{version}
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 
@@ -96,13 +99,19 @@ Biblioteka statyczna PFKeyV2.
 %patch8 -p1
 
 %build
+perl -pi -e 's!include-glibc!!g' src/Makefile.am
+
 cd src/racoon
 install %{_datadir}/automake/config.* .
+
 %{__aclocal}
 %{__autoconf}
 cd -
+
 %configure \
-	%{?_without_dist_kernel:--with-kernel-headers=/usr/src/linux/include/}
+	%{!?_with_dist_kernel:--with-kernel-headers=/usr/src/linux/include}
+
+touch src/.includes
 
 %{__make}
 
