@@ -1,12 +1,10 @@
---- ipsec-tools-0.2.4/src/racoon/Makefile.in.orig	Mon Jan 19 18:45:40 2004
-+++ ipsec-tools-0.2.4/src/racoon/Makefile.in	Tue Mar  2 12:05:33 2004
-@@ -91,8 +91,8 @@
- 	ctags -dtw $(srcdir)/*.[chly]
+--- ipsec-tools-0.2.5/src/racoon/Makefile.in.orig	2004-04-05 16:45:32.000000000 +0200
++++ ipsec-tools-0.2.5/src/racoon/Makefile.in	2004-04-16 12:09:28.544278256 +0200
+@@ -92,7 +92,7 @@
  
  install:
--	-mkdir -p $(DESTDIR)$(prefix)/sbin/
--	$(INSTALL) -s $(INSTALL_OPTS) -m 555 racoon $(DESTDIR)$($sbindir)
-+	-mkdir -p $(DESTDIR)$(sbindir)
+ 	-mkdir -p $(DESTDIR)$(sbindir)
+-	$(INSTALL) -s $(INSTALL_OPTS) -m 555 racoon $(DESTDIR)$(sbindir)
 +	$(INSTALL) $(INSTALL_OPTS) -m 555 racoon $(DESTDIR)$(sbindir)
  	-mkdir -p $(DESTDIR)$(mandir)/man8/
  	$(INSTALL) $(INSTALL_OPTS) -m 444 $(srcdir)/racoon.8 $(DESTDIR)$(mandir)/man8
