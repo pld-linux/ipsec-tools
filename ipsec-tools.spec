@@ -15,6 +15,7 @@ BuildRequires:	automake
 BuildRequires:	bison
 BuildRequires:	flex
 %{!?_without_dist_kernel:BuildRequires:	kernel-headers >= 2.5.54}
+Requires:	libipsec = %{version}
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 
 %description
