@@ -2,7 +2,7 @@
 #
 # racoon	Internet Key Exchange (IKE) daemon.
 #
-# chkconfig:	345 85 15
+# chkconfig:	345 55 85
 #
 # description:	Internet Key Exchange (IKE) daemon for automatically keying
 #		IPsec connections.
