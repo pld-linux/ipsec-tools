@@ -33,10 +33,19 @@ fi
 # See how we were called.
 case "$1" in
   start)
+											    
 	# Check if the service is already running?
 	if [ ! -f /var/lock/subsys/racoon ]; then
+		# Setting up SPD policies is not required.
+		if [ -f $SETKEY_CONF ]; then
+		    show "Setting up SPD policies"
+		    busy
+		    setkey $SETKEY_OPTIONS -f $SETKEY_CONF
+		    ok
+		fi
+
 		msg_starting racoon
-		daemon racoon
+		daemon racoon $RACOON_OPTIONS -f $RACOON_CONF
 		RETVAL=$?
 		[ $RETVAL -eq 0 ] && touch /var/lock/subsys/racoon
 	else
@@ -49,6 +58,14 @@ case "$1" in
 		msg_stopping racoon
 		killproc racoon
 		rm -f /var/lock/subsys/racoon
+		# Flush SPD policies if required
+		if [ -n "$SETKEY_FLUSH_OPTIONS" ]; then
+			show "Flushing SPD policies"
+			busy
+			setkey $SETKEY_FLUSH_OPTIONS
+			ok
+		fi
+										    
 	else
 		msg_not_running racoon
 	fi
