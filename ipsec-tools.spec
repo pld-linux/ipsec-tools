@@ -1,18 +1,22 @@
-#
+# TODO
+# - make kerberos5 works
+# - make --with-libradius compile
 # Conditional build:
-%bcond_without	kerberos5	# build with GSSAPI support
+%bcond_with	kerberos5	# build with GSSAPI support
+%bcond_with	radius		# build with radius support
 #
 %define _rc     beta1
 Summary:	User-space IPsec tools for the Linux IPsec implementation
 Summary(pl):	Narzêdzia przestrzeni u¿ytkownika dla linuksowej implementacji IPsec
 Name:		ipsec-tools
 Version:	0.6
-Release:	0.%{_rc}
+Release:	0.%{_rc}.1
 License:	BSD
 Group:		Networking/Admin
 Source0:	http://dl.sourceforge.net/ipsec-tools/%{name}-%{version}.%{_rc}.tar.bz2
 # Source0-md5:	de984670047f138d1f14f652a7b19aeb
 Source1:	%{name}-racoon.init
+Source2:	%{name}-racoon.sysconfig
 URL:		http://ipsec-tools.sourceforge.net/
 BuildRequires:	autoconf
 BuildRequires:	automake
@@ -22,6 +26,7 @@ BuildRequires:	flex
 BuildRequires:	libtool
 BuildRequires:	linux-libc-headers >= 7:2.5.54
 BuildRequires:	openssl-devel >= 0.9.7d
+%{?with_radius:BuildRequires:	radius}
 BuildRequires:	sed >= 4.0
 Requires:	libipsec = %{version}-%{release}
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
@@ -90,6 +95,7 @@ Biblioteka statyczna PFKeyV2.
 
 %configure \
 	%{?with_kerberos5:--enable-gssapi} \
+	%{?with_radius:--with-libradius} \
 	--with-kernel-headers=/usr/include \
 	--enable-dpd \
 	--enable-frag \
@@ -99,18 +105,19 @@ Biblioteka statyczna PFKeyV2.
         --enable-natt \
         --enable-natt-versions \
 	--enable-rc5 \
-	--enable-shared 
+	--enable-shared
 
 %{__make}
 
 %install
 rm -rf $RPM_BUILD_ROOT
-install -d $RPM_BUILD_ROOT/etc/{rc.d/init.d,racoon}
+install -d $RPM_BUILD_ROOT/etc/{rc.d/init.d,racoon,sysconfig}
 
 %{__make} install \
 	DESTDIR=$RPM_BUILD_ROOT
 
 install %{SOURCE1} $RPM_BUILD_ROOT/etc/rc.d/init.d/racoon
+install %{SOURCE2} $RPM_BUILD_ROOT/etc/sysconfig/racoon
 install src/racoon/samples/*.txt src/racoon/samples/*.conf $RPM_BUILD_ROOT/etc/racoon
 
 %clean
@@ -137,12 +144,14 @@ fi
 
 %files
 %defattr(644,root,root,755)
-%doc NEWS README ChangeLog
+%doc NEWS README ChangeLog src/racoon/{doc,samples} src/setkey/sample*
 %attr(755,root,root) %{_sbindir}/*
 %attr(754,root,root) /etc/rc.d/init.d/racoon
 %attr(750,root,root) %dir %{_sysconfdir}/racoon
+%attr(600,root,root) %{_sysconfdir}/racoon/*.txt
 %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/racoon/*.txt
 %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/racoon/*.conf
+%config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/sysconfig/racoon
 %{_mandir}/man[58]/*
 
 %files -n libipsec
