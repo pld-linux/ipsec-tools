@@ -1,0 +1,19 @@
+# Start-up flags for the racoon dameon. "-v" for example
+#
+RACOON_OPTIONS=""
+
+# Path to racoon.conf
+#
+RACOON_CONF=/etc/racoon/racoon.conf
+
+# Additional flags use when inserting SPD rules.
+#
+SETKEY_OPTIONS=""
+
+# Path to setkey.conf
+#
+SETKEY_CONF=/etc/racoon/setkey.conf
+
+# Flags to flush SPD on racoon exit.
+#
+SETKEY_FLUSH_OPTIONS="-FP"
