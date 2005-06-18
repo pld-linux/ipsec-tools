@@ -1,6 +1,7 @@
 # TODO
-# - make kerberos5 works
+# - make kerberos5 work
 # - make --with-libradius compile
+#
 # Conditional build:
 %bcond_with	kerberos5	# build with GSSAPI support
 %bcond_with	radius		# build with radius support
@@ -80,7 +81,7 @@ PFKeyV2 static library.
 Biblioteka statyczna PFKeyV2.
 
 %prep
-%setup -q -n %{name}-%{version}%_rc
+%setup -q -n %{name}-%{version}%{_rc}
 
 %{__sed} -i 's!@INCLUDE_GLIBC@!!g' src/Makefile.am
 %{__sed} -i 's!<gssapi/gssapi\.h>!"/usr/include/gssapi.h"!' src/racoon/gssapi.h
