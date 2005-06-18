@@ -6,7 +6,7 @@
 %bcond_with	kerberos5	# build with GSSAPI support
 %bcond_with	radius		# build with radius support
 #
-%define _rc     rc1
+%define	_rc	rc1
 Summary:	User-space IPsec tools for the Linux IPsec implementation
 Summary(pl):	Narzêdzia przestrzeni u¿ytkownika dla linuksowej implementacji IPsec
 Name:		ipsec-tools
@@ -103,8 +103,8 @@ Biblioteka statyczna PFKeyV2.
 	--enable-hybrid \
 	--enable-idea \
 	--enable-ipv6 \
-        --enable-natt \
-        --enable-natt-versions \
+	--enable-natt \
+	--enable-natt-versions \
 	--enable-rc5 \
 	--enable-shared
 
