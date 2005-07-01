@@ -6,7 +6,6 @@
 %bcond_with	kerberos5	# build with GSSAPI support
 %bcond_with	radius		# build with radius support
 #
-#%define	_rc	rc1
 Summary:	User-space IPsec tools for the Linux IPsec implementation
 Summary(pl):	Narzêdzia przestrzeni u¿ytkownika dla linuksowej implementacji IPsec
 Name:		ipsec-tools
@@ -81,7 +80,7 @@ PFKeyV2 static library.
 Biblioteka statyczna PFKeyV2.
 
 %prep
-%setup -q -n %{name}-%{version}
+%setup -q
 
 %{__sed} -i 's!@INCLUDE_GLIBC@!!g' src/Makefile.am
 %{__sed} -i 's!<gssapi/gssapi\.h>!"/usr/include/gssapi.h"!' src/racoon/gssapi.h
