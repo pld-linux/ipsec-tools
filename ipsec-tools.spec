@@ -1,9 +1,8 @@
 # TODO
-# - make kerberos5 work
 # - make --with-libradius compile
 #
 # Conditional build:
-%bcond_with	kerberos5	# build with GSSAPI support
+%bcond_without	kerberos5	# build with GSSAPI support
 %bcond_with	radius		# build with radius support
 #
 Summary:	User-space IPsec tools for the Linux IPsec implementation
