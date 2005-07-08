@@ -9,7 +9,7 @@ Summary:	User-space IPsec tools for the Linux IPsec implementation
 Summary(pl):	Narzêdzia przestrzeni u¿ytkownika dla linuksowej implementacji IPsec
 Name:		ipsec-tools
 Version:	0.6
-Release:	0.1
+Release:	1
 License:	BSD
 Group:		Networking/Admin
 Source0:	http://dl.sourceforge.net/ipsec-tools/%{name}-%{version}.tar.bz2
@@ -21,7 +21,7 @@ BuildRequires:	autoconf
 BuildRequires:	automake
 BuildRequires:	bison
 BuildRequires:	flex
-%{?with_kerberos5:BuildRequires:	heimdal-devel}
+%{?with_kerberos5:BuildRequires:	heimdal-devel >= 0.7}
 BuildRequires:	libtool
 BuildRequires:	linux-libc-headers >= 7:2.5.54
 BuildRequires:	openssl-devel >= 0.9.7d
