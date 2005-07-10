@@ -104,6 +104,7 @@ Biblioteka statyczna PFKeyV2.
 	--enable-natt \
 	--enable-natt-versions \
 	--enable-rc5 \
+	--enable-adminport \
 	--enable-shared
 
 %{__make}
