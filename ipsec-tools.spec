@@ -5,15 +5,16 @@
 %bcond_without	kerberos5	# build with GSSAPI support
 %bcond_with	radius		# build with radius support
 #
+%define _beta     b2
 Summary:	User-space IPsec tools for the Linux IPsec implementation
 Summary(pl):	Narzêdzia przestrzeni u¿ytkownika dla linuksowej implementacji IPsec
 Name:		ipsec-tools
-Version:	0.6.1
-Release:	2
+Version:	0.6.2
+Release:	0.%{_beta}.1
 License:	BSD
 Group:		Networking/Admin
-Source0:	http://dl.sourceforge.net/ipsec-tools/%{name}-%{version}.tar.bz2
-# Source0-md5:	0206b64d6531cb5fa3f195fe17e7c2a2
+Source0:	http://dl.sourceforge.net/ipsec-tools/%{name}-%{version}%{_beta}.tar.bz2
+# Source0-md5:	670e73fc66dfa6b448e96d958c57da3a
 Source1:	%{name}-racoon.init
 Source2:	%{name}-racoon.sysconfig
 URL:		http://ipsec-tools.sourceforge.net/
@@ -79,7 +80,7 @@ PFKeyV2 static library.
 Biblioteka statyczna PFKeyV2.
 
 %prep
-%setup -q
+%setup -q -n %{name}-%{version}%{_beta}
 
 %{__sed} -i 's!@INCLUDE_GLIBC@!!g' src/Makefile.am
 %{__sed} -i 's!<gssapi/gssapi\.h>!"/usr/include/gssapi.h"!' src/racoon/gssapi.h
