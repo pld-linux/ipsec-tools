@@ -9,12 +9,12 @@
 Summary:	User-space IPsec tools for the Linux IPsec implementation
 Summary(pl):	Narzêdzia przestrzeni u¿ytkownika dla linuksowej implementacji IPsec
 Name:		ipsec-tools
-Version:	0.6.2
+Version:	0.6.3
 Release:	1
 License:	BSD
 Group:		Networking/Admin
 Source0:	http://dl.sourceforge.net/ipsec-tools/%{name}-%{version}.tar.bz2
-# Source0-md5:	3d94d4a13daff63c1bd57a4f1f6462d0
+# Source0-md5:	8070f90402919d8d313c32c2ee465b2f
 Source1:	%{name}-racoon.init
 Source2:	%{name}-racoon.sysconfig
 URL:		http://ipsec-tools.sourceforge.net/
