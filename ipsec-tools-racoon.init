@@ -33,7 +33,7 @@ fi
 # See how we were called.
 case "$1" in
   start)
-											    
+
 	# Check if the service is already running?
 	if [ ! -f /var/lock/subsys/racoon ]; then
 		# Setting up SPD policies is not required.
@@ -65,7 +65,7 @@ case "$1" in
 			setkey $SETKEY_FLUSH_OPTIONS
 			ok
 		fi
-										    
+
 	else
 		msg_not_running racoon
 	fi
