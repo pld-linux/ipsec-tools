@@ -10,13 +10,14 @@ Summary:	User-space IPsec tools for the Linux IPsec implementation
 Summary(pl):	Narzêdzia przestrzeni u¿ytkownika dla linuksowej implementacji IPsec
 Name:		ipsec-tools
 Version:	0.6.4
-Release:	1
+Release:	2
 License:	BSD
 Group:		Networking/Admin
 Source0:	http://dl.sourceforge.net/ipsec-tools/%{name}-%{version}.tar.bz2
 # Source0-md5:	d0242a943c82c0cbf28005966ff35e21
 Source1:	%{name}-racoon.init
 Source2:	%{name}-racoon.sysconfig
+Patch0:		%{name}-satype-revert.patch
 URL:		http://ipsec-tools.sourceforge.net/
 BuildRequires:	autoconf
 BuildRequires:	automake
@@ -81,6 +82,7 @@ Biblioteka statyczna PFKeyV2.
 
 %prep
 %setup -q
+%patch0 -p1
 
 %{__sed} -i 's!@INCLUDE_GLIBC@!!g' src/Makefile.am
 %{__sed} -i 's!<gssapi/gssapi\.h>!"/usr/include/gssapi.h"!' src/racoon/gssapi.h
