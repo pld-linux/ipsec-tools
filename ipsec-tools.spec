@@ -159,15 +159,20 @@ fi
 
 %files -n libipsec
 %defattr(644,root,root,755)
-%attr(755,root,root) %{_libdir}/lib*.so.*.*.*
+%attr(755,root,root) %{_libdir}/libipsec.so.*.*.*
+%attr(755,root,root) %{_libdir}/libracoon.so.*.*.*
 
 %files -n libipsec-devel
 %defattr(644,root,root,755)
-%attr(755,root,root) %{_libdir}/lib*.so
-%{_libdir}/lib*.la
+%attr(755,root,root) %{_libdir}/libipsec.so
+%attr(755,root,root) %{_libdir}/libracoon.so
+%{_libdir}/libipsec.la
+%{_libdir}/libracoon.la
 %{_includedir}/libipsec
+%{_includedir}/racoon
 %{_mandir}/man3/*
 
 %files -n libipsec-static
 %defattr(644,root,root,755)
-%{_libdir}/lib*.a
+%{_libdir}/libipsec.a
+%{_libdir}/libracoon.a
