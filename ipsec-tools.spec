@@ -27,7 +27,9 @@ BuildRequires:	linux-libc-headers >= 7:2.5.54
 BuildRequires:	openssl-devel >= 0.9.7d
 %{?with_radius:BuildRequires:	radius}
 BuildRequires:	sed >= 4.0
+Requires(post,preun):	/sbin/chkconfig
 Requires:	libipsec = %{version}-%{release}
+Requires:	rc-scripts
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 
 %description
@@ -95,7 +97,7 @@ Biblioteka statyczna PFKeyV2.
 %configure \
 	%{?with_kerberos5:--enable-gssapi} \
 	%{?with_radius:--with-libradius} \
-	--with-kernel-headers=/usr/include \
+	--with-kernel-headers=%{_includedir} \
 	--enable-dpd \
 	--enable-frag \
 	--enable-hybrid \
@@ -118,7 +120,7 @@ install -d $RPM_BUILD_ROOT/etc/{rc.d/init.d,racoon,sysconfig}
 
 install %{SOURCE1} $RPM_BUILD_ROOT/etc/rc.d/init.d/racoon
 install %{SOURCE2} $RPM_BUILD_ROOT/etc/sysconfig/racoon
-install src/racoon/samples/*.txt src/racoon/samples/*.conf $RPM_BUILD_ROOT/etc/racoon
+install src/racoon/samples/*.txt src/racoon/samples/*.conf $RPM_BUILD_ROOT%{_sysconfdir}/racoon
 
 %clean
 rm -rf $RPM_BUILD_ROOT
@@ -151,7 +153,7 @@ fi
 %attr(600,root,root) %{_sysconfdir}/racoon/*.txt
 %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/racoon/*.txt
 %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/racoon/*.conf
-%config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/sysconfig/racoon
+%config(noreplace) %verify(not md5 mtime size) /etc/sysconfig/racoon
 %{_mandir}/man[58]/*
 
 %files -n libipsec
