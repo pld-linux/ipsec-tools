@@ -9,7 +9,7 @@ Summary:	User-space IPsec tools for the Linux IPsec implementation
 Summary(pl):	Narzêdzia przestrzeni u¿ytkownika dla linuksowej implementacji IPsec
 Name:		ipsec-tools
 Version:	0.6.6
-Release:	2
+Release:	3
 License:	BSD
 Group:		Networking/Admin
 Source0:	http://dl.sourceforge.net/ipsec-tools/%{name}-%{version}.tar.bz2
@@ -17,7 +17,7 @@ Source0:	http://dl.sourceforge.net/ipsec-tools/%{name}-%{version}.tar.bz2
 Source1:	%{name}-racoon.init
 Source2:	%{name}-racoon.sysconfig
 URL:		http://ipsec-tools.sourceforge.net/
-BuildRequires:	autoconf
+BuildRequires:	autoconf >= 2.52
 BuildRequires:	automake
 BuildRequires:	bison
 BuildRequires:	flex
@@ -31,6 +31,9 @@ Requires(post,preun):	/sbin/chkconfig
 Requires:	libipsec = %{version}-%{release}
 Requires:	rc-scripts
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
+
+# needed to use /var/run/racoon as sockdir
+%define		_localstatedir		/var/run
 
 %description
 IPsec-Tools is a port of the KAME Project's IPsec tools to the Linux
@@ -85,7 +88,7 @@ Biblioteka statyczna PFKeyV2.
 
 %{__sed} -i 's!@INCLUDE_GLIBC@!!g' src/Makefile.am
 %{__sed} -i 's!<gssapi/gssapi\.h>!"/usr/include/gssapi.h"!' src/racoon/gssapi.h
-%{__sed} -i 's/-Werror//' configure*
+%{__sed} -i 's/-Werror//' configure.ac
 
 %build
 %{__libtoolize}
@@ -154,6 +157,7 @@ fi
 %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/racoon/*.txt
 %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/racoon/*.conf
 %config(noreplace) %verify(not md5 mtime size) /etc/sysconfig/racoon
+%dir %{_localstatedir}/racoon
 %{_mandir}/man[58]/*
 
 %files -n libipsec
