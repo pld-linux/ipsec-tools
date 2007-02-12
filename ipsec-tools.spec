@@ -6,7 +6,7 @@
 %bcond_with	radius		# build with radius support
 #
 Summary:	User-space IPsec tools for the Linux IPsec implementation
-Summary(pl):	Narzêdzia przestrzeni u¿ytkownika dla linuksowej implementacji IPsec
+Summary(pl.UTF-8):   NarzÄ™dzia przestrzeni uÅ¼ytkownika dla linuksowej implementacji IPsec
 Name:		ipsec-tools
 Version:	0.6.6
 Release:	3
@@ -41,46 +41,46 @@ IPsec implementation. IPsec-Tools provides racoon, an IKE daemon;
 libipsec, a PFKey implementation; and setkey, a security policy and
 security association database configuration utility.
 
-%description -l pl
-IPsec-Tools to port narzêdzi IPsec z projektu KAME do linuksowej
-implementacji IPsec. IPsec-Tools dostarczaj±: racoona - demona IKE;
-libipsec - implementacjê PFKey; oraz setkey - narzêdzie konfiguracyjne
-do polityki bezpieczeñstwa oraz asocjacyjnej bazy danych
-bezpieczeñstwa.
+%description -l pl.UTF-8
+IPsec-Tools to port narzÄ™dzi IPsec z projektu KAME do linuksowej
+implementacji IPsec. IPsec-Tools dostarczajÄ…: racoona - demona IKE;
+libipsec - implementacjÄ™ PFKey; oraz setkey - narzÄ™dzie konfiguracyjne
+do polityki bezpieczeÅ„stwa oraz asocjacyjnej bazy danych
+bezpieczeÅ„stwa.
 
 %package -n libipsec
 Summary:	PFKeyV2 library
-Summary(pl):	Biblioteka PFKeyV2
+Summary(pl.UTF-8):   Biblioteka PFKeyV2
 Group:		Libraries
 
 %description -n libipsec
 PFKeyV2 library.
 
-%description -n libipsec -l pl
+%description -n libipsec -l pl.UTF-8
 Biblioteka PFKeyV2.
 
 %package -n libipsec-devel
 Summary:	PFKeyV2 library - development files
-Summary(pl):	Pliki nag³ówkowe biblioteki PFKeyV2
+Summary(pl.UTF-8):   Pliki nagÅ‚Ã³wkowe biblioteki PFKeyV2
 Group:		Development/Libraries
 Requires:	libipsec = %{version}-%{release}
 
 %description -n libipsec-devel
 PFKeyV2 library - development files.
 
-%description -n libipsec-devel -l pl
-Pliki nag³ówkowe biblioteki PFKeyV2.
+%description -n libipsec-devel -l pl.UTF-8
+Pliki nagÅ‚Ã³wkowe biblioteki PFKeyV2.
 
 %package -n libipsec-static
 Summary:	PFKeyV2 static library
-Summary(pl):	Biblioteka statyczna PFKeyV2
+Summary(pl.UTF-8):   Biblioteka statyczna PFKeyV2
 Group:		Development/Libraries
 Requires:	libipsec-devel = %{version}-%{release}
 
 %description -n libipsec-static
 PFKeyV2 static library.
 
-%description -n libipsec-static -l pl
+%description -n libipsec-static -l pl.UTF-8
 Biblioteka statyczna PFKeyV2.
 
 %prep
