@@ -6,7 +6,7 @@
 %bcond_with	radius		# build with radius support
 #
 Summary:	User-space IPsec tools for the Linux IPsec implementation
-Summary(pl.UTF-8):   Narzędzia przestrzeni użytkownika dla linuksowej implementacji IPsec
+Summary(pl.UTF-8):	Narzędzia przestrzeni użytkownika dla linuksowej implementacji IPsec
 Name:		ipsec-tools
 Version:	0.6.6
 Release:	3
@@ -50,7 +50,7 @@ bezpieczeństwa.
 
 %package -n libipsec
 Summary:	PFKeyV2 library
-Summary(pl.UTF-8):   Biblioteka PFKeyV2
+Summary(pl.UTF-8):	Biblioteka PFKeyV2
 Group:		Libraries
 
 %description -n libipsec
@@ -61,7 +61,7 @@ Biblioteka PFKeyV2.
 
 %package -n libipsec-devel
 Summary:	PFKeyV2 library - development files
-Summary(pl.UTF-8):   Pliki nagłówkowe biblioteki PFKeyV2
+Summary(pl.UTF-8):	Pliki nagłówkowe biblioteki PFKeyV2
 Group:		Development/Libraries
 Requires:	libipsec = %{version}-%{release}
 
@@ -73,7 +73,7 @@ Pliki nagłówkowe biblioteki PFKeyV2.
 
 %package -n libipsec-static
 Summary:	PFKeyV2 static library
-Summary(pl.UTF-8):   Biblioteka statyczna PFKeyV2
+Summary(pl.UTF-8):	Biblioteka statyczna PFKeyV2
 Group:		Development/Libraries
 Requires:	libipsec-devel = %{version}-%{release}
 
