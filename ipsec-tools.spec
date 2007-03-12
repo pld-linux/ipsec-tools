@@ -4,6 +4,7 @@
 # Conditional build:
 %bcond_without	kerberos5	# build with GSSAPI support
 %bcond_with	radius		# build with radius support
+%bcond_with	hip		# build with Host Identity Protocol support
 #
 Summary:	User-space IPsec tools for the Linux IPsec implementation
 Summary(pl.UTF-8):	Narzędzia przestrzeni użytkownika dla linuksowej implementacji IPsec
@@ -17,6 +18,8 @@ Source0:	http://dl.sourceforge.net/ipsec-tools/%{name}-%{version}.tar.bz2
 Source1:	%{name}-racoon.init
 Source2:	%{name}-racoon.sysconfig
 URL:		http://ipsec-tools.sourceforge.net/
+# http://downloads.sourceforge.net/openhip/ipsec-tools-0.6.6-hip.patch
+Patch0:		%{name}-hip.patch
 BuildRequires:	autoconf >= 2.52
 BuildRequires:	automake
 BuildRequires:	bison
@@ -85,6 +88,7 @@ Biblioteka statyczna PFKeyV2.
 
 %prep
 %setup -q
+%{?with_hip:%patch0 -p1}
 
 %{__sed} -i 's!@INCLUDE_GLIBC@!!g' src/Makefile.am
 %{__sed} -i 's!<gssapi/gssapi\.h>!"/usr/include/gssapi.h"!' src/racoon/gssapi.h
