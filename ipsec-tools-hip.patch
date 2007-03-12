@@ -1,0 +1,895 @@
+diff -Naur ipsec-tools-0.6.6/configure ipsec-tools-0.6.6-hip/configure
+--- ipsec-tools-0.6.6/configure	2006-06-13 01:47:26.000000000 -0700
++++ ipsec-tools-0.6.6-hip/configure	2006-06-27 08:57:46.000000000 -0700
+@@ -20753,6 +20753,7 @@
+ 
+ 
+ CFLAGS_ADD="$CFLAGS_ADD -Wall -Werror -Wno-unused"
++CFLAGS_ADD="$CFLAGS_ADD -DCONFIG_HIP -DIPPROTO_HIP=253"
+ 
+ case $host in
+ *netbsd*)
+diff -Naur ipsec-tools-0.6.6/configure.ac ipsec-tools-0.6.6-hip/configure.ac
+--- ipsec-tools-0.6.6/configure.ac	2006-06-12 11:29:30.000000000 -0700
++++ ipsec-tools-0.6.6-hip/configure.ac	2006-06-27 08:57:46.000000000 -0700
+@@ -20,6 +20,7 @@
+ AC_PROG_EGREP
+ 
+ CFLAGS_ADD="$CFLAGS_ADD -Wall -Werror -Wno-unused"
++CFLAGS_ADD="$CFLAGS_ADD -DCONFIG_HIP -DIPPROTO_HIP=253"
+ 
+ case $host in
+ *netbsd*)
+diff -Naur ipsec-tools-0.6.6/src/libipsec/ipsec_dump_policy.c ipsec-tools-0.6.6-hip/src/libipsec/ipsec_dump_policy.c
+--- ipsec-tools-0.6.6/src/libipsec/ipsec_dump_policy.c	2005-06-29 06:01:27.000000000 -0700
++++ ipsec-tools-0.6.6-hip/src/libipsec/ipsec_dump_policy.c	2006-06-27 08:57:51.000000000 -0700
+@@ -54,6 +54,10 @@
+ #include "ipsec_strerror.h"
+ #include "libpfkey.h"
+ 
++#ifndef IPSEC_MODE_BEET
++#define IPSEC_MODE_BEET      3
++#endif
++
+ static const char *ipsp_dir_strs[] = {
+ 	"any", "in", "out", "fwd"
+ };
+@@ -313,6 +317,9 @@
+ 	case IPSEC_MODE_TUNNEL:
+ 		mode = "tunnel";
+ 		break;
++	case IPSEC_MODE_BEET:
++		mode = "beet";
++		break;
+ 	default:
+ 		__ipsec_errcode = EIPSEC_INVAL_MODE;
+ 		return NULL;
+diff -Naur ipsec-tools-0.6.6/src/libipsec/pfkey.c ipsec-tools-0.6.6-hip/src/libipsec/pfkey.c
+--- ipsec-tools-0.6.6/src/libipsec/pfkey.c	2005-10-14 06:49:29.000000000 -0700
++++ ipsec-tools-0.6.6-hip/src/libipsec/pfkey.c	2006-06-27 08:57:51.000000000 -0700
+@@ -55,6 +55,57 @@
+ 
+ #define CALLOC(size, cast) (cast)calloc(1, (size))
+ 
++#ifndef SADB_EXT_HIT
++#undef SADB_MAX
++#undef SADB_EXT_MAX
++/* These normally included in the pfkeyv2.h in the kernel patch, but
++ * may not be included if compiling without the kernel patch */
++#ifdef CONFIG_HIP
++struct sadb_seqno {
++       uint16_t sadb_seqno_len;
++       uint16_t sadb_seqno_exttype;
++       uint32_t sadb_seqno;
++};
++
++struct sadb_lsi {
++       uint16_t sadb_lsi_len;
++       uint16_t sadb_lsi_exttype;
++       uint32_t sadb_lsi;
++};
++
++struct sadb_hit {
++       uint16_t        sadb_hit_len;
++       uint16_t        sadb_hit_exttype;
++       uint16_t        sadb_hit;
++       uint16_t        sadb_hit_reserved;
++} __attribute__((packed));
++
++#define SADB_GETSEQ            24
++#define SADB_GETLSI            25
++#define SADB_READDRESS         26
++#define SADB_HIP_ACQUIRE       27
++#define SADB_HIP_ADD           28
++#define SADB_MAX               29
++
++#define SADB_EXT_SEQNO                 24
++#define SADB_EXT_LSI                   25
++#define SADB_EXT_HIT                   26
++#define SADB_EXT_MAX                   26
++
++#else
++#define SADB_MAX               32
++#define SADB_SATYPE_MAX         9
++#define SADB_EXT_MAX           23
++#endif /* CONFIG_HIP */
++#endif
++
++#ifndef SADB_X_IDENTTYPE_ADDR
++#define SADB_X_IDENTTYPE_ADDR   4
++#endif
++#ifndef SADB_X_IDENTTYPE_HIT
++#define SADB_X_IDENTTYPE_HIT    5
++#endif
++
+ static int findsupportedmap __P((int));
+ static int setsupportedmap __P((struct sadb_supported *));
+ static struct sadb_alg *findsupportedalg __P((u_int, u_int));
+@@ -63,6 +114,16 @@
+ 	u_int, u_int, u_int, u_int, u_int, u_int32_t, u_int32_t,
+ 	u_int32_t, u_int32_t, u_int32_t,
+ 	u_int8_t, u_int16_t, u_int16_t, struct sockaddr *, u_int16_t));
++#ifdef CONFIG_HIP
++int pfkey_send_hip_x1 __P((int, u_int, u_int, u_int, struct sockaddr *,
++	struct sockaddr *, struct sockaddr *, struct sockaddr *, u_int32_t, 
++  u_int32_t, u_int, caddr_t,
++	u_int, u_int, u_int, u_int, u_int, u_int32_t, u_int32_t,
++	u_int32_t, u_int32_t, u_int32_t,
++	u_int8_t, u_int16_t, u_int16_t, struct sockaddr *, u_int16_t));
++int pfkey_send_rea __P((int, u_int, u_int, struct sockaddr *,
++	struct sockaddr *, u_int32_t, u_int, u_int, u_int, u_int32_t));
++#endif
+ static int pfkey_send_x2 __P((int, u_int, u_int, u_int,
+ 	struct sockaddr *, struct sockaddr *, u_int32_t));
+ static int pfkey_send_x3 __P((int, u_int, u_int));
+@@ -89,6 +150,10 @@
+ #ifdef SADB_X_EXT_NAT_T_FRAG
+ static caddr_t pfkey_set_natt_frag __P((caddr_t, caddr_t, u_int, u_int16_t));
+ #endif
++#ifdef CONFIG_HIP
++static caddr_t pfkey_setsadbhit __P((caddr_t, caddr_t, u_int16_t));
++static caddr_t pfkey_setsadbident __P((caddr_t, caddr_t, u_int, struct sockaddr *));
++#endif
+ 
+ /*
+  * make and search supported algorithm structure.
+@@ -1456,6 +1521,388 @@
+ 	return len;
+ }
+ 
++/* sending SADB_ADD or SADB_UPDATE message to the kernel */
++#ifdef CONFIG_HIP
++int
++pfkey_send_hip_x1(so, type, satype, mode, src, dst, ident_src, ident_dst,
++    spi, reqid, wsize, keymat, e_type, e_keylen, a_type, a_keylen, flags,
++		l_alloc, l_bytes, l_addtime, l_usetime, seq,
++	        l_natt_type, l_natt_sport, l_natt_dport, l_natt_oa, hit)
++	int so;
++	u_int type, satype, mode;
++	struct sockaddr *src, *dst, *l_natt_oa, *ident_src, *ident_dst;
++	u_int32_t spi, reqid;
++	u_int wsize;
++	caddr_t keymat;
++	u_int e_type, e_keylen, a_type, a_keylen, flags;
++	u_int32_t l_alloc, l_bytes, l_addtime, l_usetime, seq;
++	u_int16_t l_natt_sport, l_natt_dport;
++	u_int8_t l_natt_type;
++	u_int16_t hit;
++{
++	struct sadb_msg *newmsg;
++	int len;
++	caddr_t p;
++	int plen;
++	caddr_t ep;
++
++	/* validity check */
++	if (src == NULL || dst == NULL) {
++		__ipsec_errcode = EIPSEC_INVAL_ARGUMENT;
++		return -1;
++	}
++	if (src->sa_family != dst->sa_family) {
++		__ipsec_errcode = EIPSEC_FAMILY_MISMATCH;
++		return -1;
++	}
++  if (ident_src && ident_dst && ident_src->sa_family != ident_dst->sa_family) {
++    __ipsec_errcode = EIPSEC_FAMILY_MISMATCH;
++    return -1;
++  }
++	switch (src->sa_family) {
++	case AF_INET:
++		plen = sizeof(struct in_addr) << 3;
++		break;
++	case AF_INET6:
++		plen = sizeof(struct in6_addr) << 3;
++		break;
++	default:
++		__ipsec_errcode = EIPSEC_INVAL_FAMILY;
++		return -1;
++	}
++
++	switch (satype) {
++	case SADB_SATYPE_ESP:
++		if (e_type == SADB_EALG_NONE) {
++			__ipsec_errcode = EIPSEC_NO_ALGS;
++			return -1;
++		}
++		break;
++	case SADB_SATYPE_AH:
++		if (e_type != SADB_EALG_NONE) {
++			__ipsec_errcode = EIPSEC_INVAL_ALGS;
++			return -1;
++		}
++		if (a_type == SADB_AALG_NONE) {
++			__ipsec_errcode = EIPSEC_NO_ALGS;
++			return -1;
++		}
++		break;
++	case SADB_X_SATYPE_IPCOMP:
++		if (e_type == SADB_X_CALG_NONE) {
++			__ipsec_errcode = EIPSEC_INVAL_ALGS;
++			return -1;
++		}
++		if (a_type != SADB_AALG_NONE) {
++			__ipsec_errcode = EIPSEC_NO_ALGS;
++			return -1;
++		}
++		break;
++	default:
++		__ipsec_errcode = EIPSEC_INVAL_SATYPE;
++		return -1;
++	}
++
++	/* create new sadb_msg to reply. */
++	len = sizeof(struct sadb_msg)
++		+ sizeof(struct sadb_sa)
++		+ sizeof(struct sadb_x_sa2)
++		+ sizeof(struct sadb_address)
++		+ PFKEY_ALIGN8(sysdep_sa_len(src))
++		+ sizeof(struct sadb_address)
++		+ PFKEY_ALIGN8(sysdep_sa_len(dst))
++		+ sizeof(struct sadb_lifetime)
++		+ sizeof(struct sadb_lifetime)
++		+ sizeof(struct sadb_hit);
++
++  if (ident_src && ident_dst) {
++    len += sizeof(struct sadb_ident) + PFKEY_ALIGN8(sysdep_sa_len(ident_src))
++     + sizeof(struct sadb_ident) + PFKEY_ALIGN8(sysdep_sa_len(ident_dst));
++  }
++	if (e_type != SADB_EALG_NONE && satype != SADB_X_SATYPE_IPCOMP)
++		len += (sizeof(struct sadb_key) + PFKEY_ALIGN8(e_keylen));
++	if (a_type != SADB_AALG_NONE)
++		len += (sizeof(struct sadb_key) + PFKEY_ALIGN8(a_keylen));
++
++
++#ifdef SADB_X_EXT_NAT_T_TYPE
++	/* add nat-t packets */
++	if (l_natt_type) {
++		if (satype != SADB_SATYPE_ESP) {
++			__ipsec_errcode = EIPSEC_NO_ALGS;
++			return -1;
++		}
++
++		len += sizeof(struct sadb_x_nat_t_type);
++		len += sizeof(struct sadb_x_nat_t_port);
++		len += sizeof(struct sadb_x_nat_t_port);
++		if (l_natt_oa)
++			len += sizeof(struct sadb_address) +
++			  PFKEY_ALIGN8(sysdep_sa_len(l_natt_oa));
++	}
++#endif
++
++	if ((newmsg = CALLOC(len, struct sadb_msg *)) == NULL) {
++		__ipsec_set_strerror(strerror(errno));
++		return -1;
++	}
++	ep = ((caddr_t)newmsg) + len;
++
++	p = pfkey_setsadbmsg((caddr_t)newmsg, ep, type, len,
++	                     satype, seq, getpid());
++	if (!p) {
++		free(newmsg);
++		return -1;
++	}
++	p = pfkey_setsadbsa(p, ep, spi, wsize, a_type, e_type, flags);
++	if (!p) {
++		free(newmsg);
++		return -1;
++	}
++	p = pfkey_setsadbxsa2(p, ep, mode, reqid);
++	if (!p) {
++		free(newmsg);
++		return -1;
++	}
++	p = pfkey_setsadbaddr(p, ep, SADB_EXT_ADDRESS_SRC, src, plen,
++	    IPSEC_ULPROTO_ANY);
++	if (!p) {
++		free(newmsg);
++		return -1;
++	}
++	p = pfkey_setsadbaddr(p, ep, SADB_EXT_ADDRESS_DST, dst, plen,
++	    IPSEC_ULPROTO_ANY);
++	if (!p) {
++		free(newmsg);
++		return -1;
++	}
++
++	if (e_type != SADB_EALG_NONE && satype != SADB_X_SATYPE_IPCOMP) {
++		p = pfkey_setsadbkey(p, ep, SADB_EXT_KEY_ENCRYPT,
++		                   keymat, e_keylen);
++		if (!p) {
++			free(newmsg);
++			return -1;
++		}
++	}
++	if (a_type != SADB_AALG_NONE) {
++		p = pfkey_setsadbkey(p, ep, SADB_EXT_KEY_AUTH,
++		                   keymat + e_keylen, a_keylen);
++		if (!p) {
++			free(newmsg);
++			return -1;
++		}
++	}
++
++	/* set sadb_lifetime for destination */
++	p = pfkey_setsadblifetime(p, ep, SADB_EXT_LIFETIME_HARD,
++			l_alloc, l_bytes, l_addtime, l_usetime);
++	if (!p) {
++		free(newmsg);
++		return -1;
++	}
++	p = pfkey_setsadblifetime(p, ep, SADB_EXT_LIFETIME_SOFT,
++			l_alloc, l_bytes, l_addtime, l_usetime);
++	if (!p) {
++		free(newmsg);
++		return -1;
++	}
++
++#ifdef SADB_X_EXT_NAT_T_TYPE
++	/* Add nat-t messages */
++	if (l_natt_type) {
++		p = pfkey_set_natt_type(p, ep, SADB_X_EXT_NAT_T_TYPE, l_natt_type);
++		if (!p) {
++			free(newmsg);
++			return -1;
++		}
++
++		p = pfkey_set_natt_port(p, ep, SADB_X_EXT_NAT_T_SPORT,
++					l_natt_sport);
++		if (!p) {
++			free(newmsg);
++			return -1;
++		}
++
++		p = pfkey_set_natt_port(p, ep, SADB_X_EXT_NAT_T_DPORT,
++					l_natt_dport);
++		if (!p) {
++			free(newmsg);
++			return -1;
++		}
++
++		if (l_natt_oa) {
++			p = pfkey_setsadbaddr(p, ep, SADB_X_EXT_NAT_T_OA,
++					      l_natt_oa,
++					      PFKEY_ALIGN8(sysdep_sa_len(l_natt_oa)),
++					      IPSEC_ULPROTO_ANY);
++			if (!p) {
++				free(newmsg);
++				return -1;
++			}
++		}
++	}
++#endif
++	p = pfkey_setsadbhit(p, ep, hit);
++	if (!p) {
++		free(newmsg);
++		return -1;
++	}
++
++  if (ident_src && ident_dst) {
++    p = pfkey_setsadbident (p, ep, 0, ident_src);
++    if (!p) {
++      free(newmsg);
++      return -1;
++    }
++ 
++    p = pfkey_setsadbident (p, ep, 1, ident_dst);
++    if (!p) {
++      free(newmsg);
++      return -1;
++    }
++  }
++
++	if (p != ep) {
++		free(newmsg);
++		return -1;
++	}
++
++	/* send message */
++	len = pfkey_send(so, newmsg, len);
++	free(newmsg);
++
++	if (len < 0)
++		return -1;
++
++	__ipsec_errcode = EIPSEC_NO_ERROR;
++	return len;
++}
++#endif
++
++#ifdef CONFIG_HIP
++/*
++ * Send SADB_READDRESS message to the kernel
++ */
++int
++pfkey_send_rea(so, type, satype, src, dst, spi, e_type, a_type, flags, seq)
++	int so;
++	u_int type, satype;
++	struct sockaddr *src, *dst;
++	u_int32_t spi;
++	u_int e_type, a_type, flags;
++	u_int32_t seq;
++{
++	struct sadb_msg *newmsg;
++	int len;
++	caddr_t p;
++	int plen;
++	caddr_t ep;
++
++	/* validity check */
++	if (src == NULL || dst == NULL) {
++		__ipsec_errcode = EIPSEC_INVAL_ARGUMENT;
++		return -1;
++	}
++	/* XXX remove this check when the kernel supports readdress
++	 *     across different address families (IPv4 <==> IPv6)
++	 */
++	if (src->sa_family != dst->sa_family) {
++		__ipsec_errcode = EIPSEC_FAMILY_MISMATCH;
++		return -1;
++	}
++	switch (src->sa_family) {
++	case AF_INET:
++		plen = sizeof(struct in_addr) << 3;
++		break;
++	case AF_INET6:
++		plen = sizeof(struct in6_addr) << 3;
++		break;
++	default:
++		__ipsec_errcode = EIPSEC_INVAL_FAMILY;
++		return -1;
++	}
++
++	/* Readdressing supported for ESP/AH satypes */
++	switch (satype) {
++	case SADB_SATYPE_ESP:
++		if (e_type == SADB_EALG_NONE) {
++			__ipsec_errcode = EIPSEC_NO_ALGS;
++			return -1;
++		}
++		break;
++	case SADB_SATYPE_AH:
++		if (e_type != SADB_EALG_NONE) {
++			__ipsec_errcode = EIPSEC_INVAL_ALGS;
++			return -1;
++		}
++		if (a_type == SADB_AALG_NONE) {
++			__ipsec_errcode = EIPSEC_NO_ALGS;
++			return -1;
++		}
++		break;
++	default:
++		__ipsec_errcode = EIPSEC_INVAL_SATYPE;
++		return -1;
++	}
++
++	/* create new sadb_msg */
++	len = sizeof(struct sadb_msg)
++		+ sizeof(struct sadb_sa)
++		+ sizeof(struct sadb_address)
++		+ PFKEY_ALIGN8(sysdep_sa_len(src))
++		+ sizeof(struct sadb_address)
++		+ PFKEY_ALIGN8(sysdep_sa_len(dst));
++
++	if ((newmsg = CALLOC(len, struct sadb_msg *)) == NULL) {
++		__ipsec_set_strerror(strerror(errno));
++		return -1;
++	}
++	ep = ((caddr_t)newmsg) + len;
++
++	p = pfkey_setsadbmsg((caddr_t)newmsg, ep, type, len,
++	                     satype, seq, getpid());
++	if (!p) {
++		free(newmsg);
++		return -1;
++	}
++	/* SA extension */
++	p = pfkey_setsadbsa(p, ep, spi, 0, a_type, e_type, flags);
++	if (!p) {
++		free(newmsg);
++		return -1;
++	}
++	/* SRC / DST addresses */
++	p = pfkey_setsadbaddr(p, ep, SADB_EXT_ADDRESS_SRC, src, plen,
++	    IPSEC_ULPROTO_ANY);
++	if (!p) {
++		free(newmsg);
++		return -1;
++	}
++	p = pfkey_setsadbaddr(p, ep, SADB_EXT_ADDRESS_DST, dst, plen,
++	    IPSEC_ULPROTO_ANY);
++	if (!p) {
++		free(newmsg);
++		return -1;
++	}
++
++	if (p != ep) {
++		free(newmsg);
++		return -1;
++	}
++
++	/* send message */
++	len = pfkey_send(so, newmsg, len);
++	free(newmsg);
++
++	if (len < 0)
++		return -1;
++
++	__ipsec_errcode = EIPSEC_NO_ERROR;
++	return len;
++}
++#endif
++
+ /* sending SADB_DELETE or SADB_GET message to the kernel */
+ /*ARGSUSED*/
+ static int
+@@ -2180,7 +2627,11 @@
+ 	p->sadb_sa_exttype = SADB_EXT_SA;
+ 	p->sadb_sa_spi = spi;
+ 	p->sadb_sa_replay = wsize;
++#ifdef CONFIG_HIP
++	p->sadb_sa_state = SADB_SASTATE_MATURE;
++#else
+ 	p->sadb_sa_state = SADB_SASTATE_LARVAL;
++#endif
+ 	p->sadb_sa_auth = auth;
+ 	p->sadb_sa_encrypt = enc;
+ 	p->sadb_sa_flags = flags;
+@@ -2405,3 +2856,64 @@
+ 	return(buf + len);
+ }
+ #endif
++
++#ifdef CONFIG_HIP
++static caddr_t
++pfkey_setsadbhit(buf, lim, val)
++        caddr_t buf;
++        caddr_t lim;
++        u_int16_t val;
++{
++        struct sadb_hit *p;
++                                                                                
++        u_int len;
++                                                                                
++        p = (struct sadb_hit *)buf;
++        len = sizeof(struct sadb_hit);
++                                                                                
++        if (buf + len > lim)
++                return NULL;
++                                                                                
++        memset(p, 0, len);
++        p->sadb_hit_len = PFKEY_UNIT64(len);
++        p->sadb_hit_exttype = SADB_EXT_HIT;
++        p->sadb_hit = val;
++                                                                                
++        return(buf + len);
++                                                                                
++}
++static caddr_t
++pfkey_setsadbident(buf, lim, dir, ident)
++         caddr_t buf;
++         caddr_t lim;
++         u_int dir; /* 0=src , 1=dst */
++         struct sockaddr *ident;
++ 
++{
++  struct sadb_ident *p;
++  u_int len;
++ 
++  p = (struct sadb_ident *) buf;
++ 
++  len = sizeof (struct sadb_ident) + PFKEY_ALIGN8(sysdep_sa_len(ident));
++ 
++  if (buf+len>lim)
++    return NULL;
++ 
++  memset(p, 0, len);
++  p->sadb_ident_len = PFKEY_UNIT64(len);
++  if (dir) {
++    p->sadb_ident_exttype = SADB_EXT_IDENTITY_DST;
++  }
++  else {
++    p->sadb_ident_exttype = SADB_EXT_IDENTITY_SRC;
++  }
++  p->sadb_ident_type = SADB_X_IDENTTYPE_HIT;
++  p->sadb_ident_reserved = 0;
++  p->sadb_ident_id = getuid();
++ 
++  memcpy(p+1, ident, (size_t)sysdep_sa_len(ident));
++ 
++  return (buf+len);
++}
++#endif
+diff -Naur ipsec-tools-0.6.6/src/libipsec/pfkey_dump.c ipsec-tools-0.6.6-hip/src/libipsec/pfkey_dump.c
+--- ipsec-tools-0.6.6/src/libipsec/pfkey_dump.c	2005-12-07 05:45:05.000000000 -0800
++++ ipsec-tools-0.6.6-hip/src/libipsec/pfkey_dump.c	2006-06-27 08:57:51.000000000 -0700
+@@ -140,6 +140,7 @@
+ 	"any",
+ 	"transport",
+ 	"tunnel",
++  "beet",
+ };
+ 
+ static char *str_state[] = {
+diff -Naur ipsec-tools-0.6.6/src/libipsec/policy_parse.y ipsec-tools-0.6.6-hip/src/libipsec/policy_parse.y
+--- ipsec-tools-0.6.6/src/libipsec/policy_parse.y	2005-10-04 02:54:27.000000000 -0700
++++ ipsec-tools-0.6.6-hip/src/libipsec/policy_parse.y	2006-06-27 08:57:51.000000000 -0700
+@@ -76,6 +76,10 @@
+ #  include <netinet/ipsec.h>
+ #endif
+ 
++#ifndef IPSEC_MODE_BEET
++#define IPSEC_MODE_BEET 3
++#endif
++
+ #include <stdlib.h>
+ #include <stdio.h>
+ #include <string.h>
+@@ -99,7 +103,7 @@
+ #define ATOX(c) \
+   (isdigit(c) ? (c - '0') : (isupper(c) ? (c - 'A' + 10) : (c - 'a' + 10) ))
+ 
+-static u_int8_t *pbuf = NULL;		/* sadb_x_policy buffer */
++static caddr_t pbuf = NULL;		/* sadb_x_policy buffer */
+ static int tlen = 0;			/* total length of pbuf */
+ static int offset = 0;			/* offset of pbuf */
+ static int p_dir, p_type, p_protocol, p_mode, p_level, p_reqid;
+@@ -466,7 +470,8 @@
+ 		}
+ 
+ 		if (p_mode != IPSEC_MODE_TRANSPORT
+-		 && p_mode != IPSEC_MODE_TUNNEL) {
++		 && p_mode != IPSEC_MODE_TUNNEL
++     && p_mode != IPSEC_MODE_BEET) {
+ 			__ipsec_errcode = EIPSEC_INVAL_MODE;
+ 			return -1;
+ 		}
+@@ -534,19 +539,17 @@
+ {
+ 	struct sadb_x_ipsecrequest *p;
+ 	int reqlen;
+-	u_int8_t *n;
+ 
+ 	reqlen = sizeof(*p)
+ 		+ (src ? sysdep_sa_len(src) : 0)
+ 		+ (dst ? sysdep_sa_len(dst) : 0);
+ 	tlen += reqlen;		/* increment to total length */
+ 
+-	n = realloc(pbuf, tlen);
+-	if (n == NULL) {
++  pbuf = realloc(pbuf, tlen);
++	if (pbuf == NULL) {
+ 		__ipsec_errcode = EIPSEC_NO_BUFS;
+ 		return -1;
+ 	}
+-	pbuf = n;
+ 
+ 	p = (struct sadb_x_ipsecrequest *)&pbuf[offset];
+ 	p->sadb_x_ipsecrequest_len = reqlen;
+diff -Naur ipsec-tools-0.6.6/src/libipsec/policy_token.l ipsec-tools-0.6.6-hip/src/libipsec/policy_token.l
+--- ipsec-tools-0.6.6/src/libipsec/policy_token.l	2005-05-07 07:30:38.000000000 -0700
++++ ipsec-tools-0.6.6-hip/src/libipsec/policy_token.l	2006-06-27 08:57:51.000000000 -0700
+@@ -51,6 +51,10 @@
+ #include <unistd.h>
+ #include <errno.h>
+ 
++#ifndef IPSEC_MODE_BEET
++#define IPSEC_MODE_BEET 3
++#endif
++
+ #include "libpfkey.h"
+ 
+ #if !defined(__NetBSD__) && !defined(__FreeBSD__) && !defined(__linux__)
+@@ -128,9 +132,11 @@
+ esp		{ yylval.num = IPPROTO_ESP; return(PROTOCOL); }
+ ah		{ yylval.num = IPPROTO_AH; return(PROTOCOL); }
+ ipcomp		{ yylval.num = IPPROTO_IPCOMP; return(PROTOCOL); }
++hip		{ yylval.num = IPPROTO_HIP; return(PROTOCOL); }
+ 
+ transport	{ yylval.num = IPSEC_MODE_TRANSPORT; return(MODE); }
+ tunnel		{ yylval.num = IPSEC_MODE_TUNNEL; return(MODE); }
++beet		{ yylval.num = IPSEC_MODE_BEET; return(MODE); }
+ 
+ me		{ return(ME); }
+ any		{ return(ANY); }
+diff -Naur ipsec-tools-0.6.6/src/racoon/isakmp.c ipsec-tools-0.6.6-hip/src/racoon/isakmp.c
+--- ipsec-tools-0.6.6/src/racoon/isakmp.c	2006-02-02 02:31:01.000000000 -0800
++++ ipsec-tools-0.6.6-hip/src/racoon/isakmp.c	2006-06-27 08:58:04.000000000 -0700
+@@ -205,7 +205,7 @@
+ 
+ 	/* read message by MSG_PEEK */
+ 	while ((len = recvfromto(so_isakmp, x.buf, sizeof(x),
+-		    MSG_PEEK, (struct sockaddr *)&remote, &remote_len,
++		    MSG_PEEK, (struct sockaddr *)&remote, (socklen_t *)&remote_len,
+ 		    (struct sockaddr *)&local, &local_len)) < 0) {
+ 		if (errno == EINTR)
+ 			continue;
+@@ -282,7 +282,7 @@
+ 	}
+ 
+ 	while ((len = recvfromto(so_isakmp, (char *)tmpbuf->v, tmpbuf->l,
+-	                    0, (struct sockaddr *)&remote, &remote_len,
++	                    0, (struct sockaddr *)&remote, (socklen_t *)&remote_len,
+ 	                    (struct sockaddr *)&local, &local_len)) < 0) {
+ 		if (errno == EINTR)
+ 			continue;
+diff -Naur ipsec-tools-0.6.6/src/racoon/oakley.c ipsec-tools-0.6.6-hip/src/racoon/oakley.c
+--- ipsec-tools-0.6.6/src/racoon/oakley.c	2005-10-04 02:54:27.000000000 -0700
++++ ipsec-tools-0.6.6-hip/src/racoon/oakley.c	2006-06-27 08:58:04.000000000 -0700
+@@ -2241,7 +2241,8 @@
+ {
+ 	cert_t *new;
+         int len;
+-        u_char *bp;
++        char *bp;
++	u_char *ubp;
+ 
+ 	new = oakley_newcert();
+ 	if (!new) {
+@@ -2259,8 +2260,8 @@
+ 		new = NULL;
+ 		return NULL;
+ 	}
+-        bp = (u_char *) new->pl->v;
+-        len = i2d_X509(cert, &bp);
++        ubp = (u_char *) new->pl->v;
++        len = i2d_X509(cert, &ubp);
+ 	new->type = ISAKMP_CERT_X509SIGN;
+ 	new->cert.v = new->pl->v;
+ 	new->cert.l = new->pl->l;
+diff -Naur ipsec-tools-0.6.6/src/racoon/pfkey.c ipsec-tools-0.6.6-hip/src/racoon/pfkey.c
+--- ipsec-tools-0.6.6/src/racoon/pfkey.c	2006-05-05 02:09:03.000000000 -0700
++++ ipsec-tools-0.6.6-hip/src/racoon/pfkey.c	2006-06-27 08:58:04.000000000 -0700
+@@ -155,7 +155,7 @@
+ NULL,	/* SADB_X_SPDDELETE2 */
+ NULL,	/* SADB_X_NAT_T_NEW_MAPPING */
+ NULL, /* SADB_X_MIGRATE */
+-#if (SADB_MAX > 24)
++#if (SADB_MAX > 29)
+ #error "SADB extra message?"
+ #endif
+ };
+diff -Naur ipsec-tools-0.6.6/src/setkey/parse.y ipsec-tools-0.6.6-hip/src/setkey/parse.y
+--- ipsec-tools-0.6.6/src/setkey/parse.y	2005-12-04 12:41:47.000000000 -0800
++++ ipsec-tools-0.6.6-hip/src/setkey/parse.y	2006-06-27 08:58:04.000000000 -0700
+@@ -61,6 +61,16 @@
+ 
+ #define DEFAULT_NATT_PORT	4500
+ 
++/* These defines required for Linux User-Mode HIP */
++#ifndef SADB_X_SATYPE_HIP
++#undef SADB_SATYPE_MAX
++#define SADB_X_SATYPE_HIP  10
++#define SADB_SATYPE_MAX    10
++#endif
++
++#define SADB_X_IDENTTYPE_ADDR 4
++#define SADB_X_IDENTTYPE_HIT 5
++
+ #ifndef UDP_ENCAP_ESPINUDP
+ #define UDP_ENCAP_ESPINUDP	2
+ #endif
+@@ -70,6 +80,7 @@
+     (isupper((int)c) ? (c - 'A' + 10) : (c - 'a' + 10)))
+ 
+ u_int32_t p_spi;
++struct addrinfo *p_ident_src, *p_ident_dst;
+ u_int p_ext, p_alg_enc, p_alg_auth, p_replay, p_mode;
+ u_int32_t p_reqid;
+ u_int p_key_enc_len, p_key_auth_len;
+@@ -109,10 +120,11 @@
+ 
+ %token EOT SLASH BLCL ELCL
+ %token ADD GET DELETE DELETEALL FLUSH DUMP EXIT
+-%token PR_ESP PR_AH PR_IPCOMP PR_ESPUDP PR_TCP
++%token PR_ESP PR_AH PR_IPCOMP PR_ESPUDP PR_TCP PR_HIP
+ %token F_PROTOCOL F_AUTH F_ENC F_REPLAY F_COMP F_RAWCPI
+ %token F_MODE MODE F_REQID
+ %token F_EXT EXTENSION NOCYCLICSEQ
++%token F_IDENT
+ %token ALG_AUTH ALG_AUTH_NOKEY
+ %token ALG_ENC ALG_ENC_NOKEY ALG_ENC_DESDERIV ALG_ENC_DES32IV ALG_ENC_OLD
+ %token ALG_COMP
+@@ -129,7 +141,7 @@
+ %type <num> ALG_ENC ALG_ENC_DESDERIV ALG_ENC_DES32IV ALG_ENC_OLD ALG_ENC_NOKEY
+ %type <num> ALG_AUTH ALG_AUTH_NOKEY
+ %type <num> ALG_COMP
+-%type <num> PR_ESP PR_AH PR_IPCOMP PR_ESPUDP PR_TCP
++%type <num> PR_ESP PR_AH PR_IPCOMP PR_ESPUDP PR_TCP PR_HIP
+ %type <num> EXTENSION MODE
+ %type <ulnum> DECSTRING
+ %type <val> PL_REQUESTS portstr key_string
+@@ -287,6 +299,10 @@
+ 			$$ = SADB_X_SATYPE_TCPSIGNATURE;
+ #endif
+ 		}
++	|	PR_HIP
++		{
++			$$ = SADB_X_SATYPE_HIP;
++		}
+ 	;
+ 	
+ spi
+@@ -532,7 +548,9 @@
+ 	|	F_LIFETIME_HARD DECSTRING { p_lt_hard = $2; }
+ 	|	F_LIFETIME_SOFT DECSTRING { p_lt_soft = $2; }
+ 	|	F_LIFEBYTE_HARD DECSTRING { p_lb_hard = $2; }
+-	|	F_LIFEBYTE_SOFT DECSTRING { p_lb_soft = $2; }
++  | F_LIFEBYTE_SOFT DECSTRING { p_lb_soft = $2; }
++  | F_IDENT ipaddr ipaddr { p_ident_src = $2;  p_ident_dst = $3; }
++
+ 	;
+ 
+ 	/* definition about command for SPD management */
+@@ -1236,6 +1254,31 @@
+ 			p_key_auth, p_key_auth_len);
+ 	}
+ 
++  if (p_ident_src != 0 && p_ident_dst != 0) {
++    struct sadb_ident m_id;
++    m_id.sadb_ident_len      = PFKEY_UNIT64(sizeof(m_id) +
++              PFKEY_ALIGN8(p_ident_src->ai_addrlen));
++    m_id.sadb_ident_exttype  = SADB_EXT_IDENTITY_SRC;
++    m_id.sadb_ident_type     = SADB_X_IDENTTYPE_HIT;
++    m_id.sadb_ident_reserved = 0;
++    m_id.sadb_ident_id       = getuid(); /* XXX */
++ 
++    setvarbuf(buf, &l,
++        (struct sadb_ext *)((void *)&m_id), sizeof(m_id),
++        (void*)p_ident_src->ai_addr, p_ident_src->ai_addrlen);
++ 
++    m_id.sadb_ident_len      = PFKEY_UNIT64(sizeof(m_id) +
++              PFKEY_ALIGN8(p_ident_dst->ai_addrlen));
++    m_id.sadb_ident_exttype  = SADB_EXT_IDENTITY_DST;
++    m_id.sadb_ident_type     = SADB_X_IDENTTYPE_HIT;
++    m_id.sadb_ident_reserved = 0;
++    m_id.sadb_ident_id       = getuid(); /* XXX */
++
++    setvarbuf(buf, &l,
++       (struct sadb_ext *)((void *) &m_id), sizeof(m_id),
++       (void*)p_ident_dst->ai_addr, p_ident_dst->ai_addrlen);
++}
++
+ 	/* set lifetime for HARD */
+ 	if (p_lt_hard != 0 || p_lb_hard != 0) {
+ 		struct sadb_lifetime m_lt;
+@@ -1506,6 +1549,7 @@
+ 	p_alg_enc = SADB_EALG_NONE;
+ 	p_alg_auth = SADB_AALG_NONE;
+ 	p_mode = IPSEC_MODE_ANY;
++  p_ident_src = p_ident_dst = NULL;
+ 	p_reqid = 0;
+ 	p_replay = 0;
+ 	p_key_enc_len = p_key_auth_len = 0;
+diff -Naur ipsec-tools-0.6.6/src/setkey/token.l ipsec-tools-0.6.6-hip/src/setkey/token.l
+--- ipsec-tools-0.6.6/src/setkey/token.l	2005-06-29 06:01:30.000000000 -0700
++++ ipsec-tools-0.6.6-hip/src/setkey/token.l	2006-06-27 08:58:04.000000000 -0700
+@@ -62,6 +62,10 @@
+ 
+ #include "extern.h"
+ 
++#ifndef IPSEC_MODE_BEET
++#define IPSEC_MODE_BEET 3
++#endif
++
+ /* make the code compile on *BSD-current */
+ #ifndef SADB_X_AALG_SHA2_256
+ #define SADB_X_AALG_SHA2_256	(-1)
+@@ -167,6 +171,7 @@
+ tcp		{ 
+ 			yylval.num = 0; return(PR_TCP); 
+ 		}
++hip		{ yylval.num = 0; return(PR_HIP); }
+ 
+ 	/* authentication alogorithm */
+ {hyphen}A	{ BEGIN S_AUTHALG; return(F_AUTH); }
+@@ -225,8 +230,10 @@
+ {hyphen}m	{ return(F_MODE); }
+ transport	{ yylval.num = IPSEC_MODE_TRANSPORT; return(MODE); }
+ tunnel		{ yylval.num = IPSEC_MODE_TUNNEL; return(MODE); }
++beet		  { yylval.num = IPSEC_MODE_BEET; return(MODE); }
+ {hyphen}u	{ return(F_REQID); }
+ {hyphen}f	{ return(F_EXT); }
++{hyphen}i	{ return(F_IDENT); }
+ random-pad	{ yylval.num = SADB_X_EXT_PRAND; return(EXTENSION); }
+ seq-pad		{ yylval.num = SADB_X_EXT_PSEQ; return(EXTENSION); }
+ zero-pad	{ yylval.num = SADB_X_EXT_PZERO; return(EXTENSION); }
