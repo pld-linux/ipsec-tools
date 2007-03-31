@@ -10,7 +10,7 @@ Summary:	User-space IPsec tools for the Linux IPsec implementation
 Summary(pl.UTF-8):	Narzędzia przestrzeni użytkownika dla linuksowej implementacji IPsec
 Name:		ipsec-tools
 Version:	0.6.6
-Release:	3
+Release:	4
 License:	BSD
 Group:		Networking/Admin
 Source0:	http://dl.sourceforge.net/ipsec-tools/%{name}-%{version}.tar.bz2
@@ -24,7 +24,7 @@ BuildRequires:	autoconf >= 2.52
 BuildRequires:	automake
 BuildRequires:	bison
 BuildRequires:	flex
-%{?with_kerberos5:BuildRequires:	heimdal-devel >= 0.7}
+%{?with_kerberos5:BuildRequires:	krb5-devel}
 BuildRequires:	libtool
 BuildRequires:	linux-libc-headers >= 7:2.5.54
 BuildRequires:	openssl-devel >= 0.9.7d
@@ -91,7 +91,6 @@ Biblioteka statyczna PFKeyV2.
 %{?with_hip:%patch0 -p1}
 
 %{__sed} -i 's!@INCLUDE_GLIBC@!!g' src/Makefile.am
-%{__sed} -i 's!<gssapi/gssapi\.h>!"/usr/include/gssapi.h"!' src/racoon/gssapi.h
 %{__sed} -i 's/-Werror//' configure.ac
 
 %build
