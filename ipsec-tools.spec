@@ -6,15 +6,16 @@
 %bcond_with	radius		# build with radius support
 %bcond_with	hip		# build with Host Identity Protocol support
 #
+%define	snap	rc1
 Summary:	User-space IPsec tools for the Linux IPsec implementation
 Summary(pl.UTF-8):	Narzędzia przestrzeni użytkownika dla linuksowej implementacji IPsec
 Name:		ipsec-tools
-Version:	0.6.7
-Release:	1
+Version:	0.7
+Release:	0.%{snap}.1
 License:	BSD
 Group:		Networking/Admin
-Source0:	http://dl.sourceforge.net/ipsec-tools/%{name}-%{version}.tar.bz2
-# Source0-md5:	4fb764f282dc21cf9a656c58e13dacbb
+Source0:	http://dl.sourceforge.net/ipsec-tools/%{name}-%{version}-%{snap}.tar.bz2
+# Source0-md5:	511a740a4fd1f8b9d20906504567969a
 Source1:	%{name}-racoon.init
 Source2:	%{name}-racoon.sysconfig
 URL:		http://ipsec-tools.sourceforge.net/
@@ -27,8 +28,12 @@ BuildRequires:	flex
 %{?with_kerberos5:BuildRequires:	krb5-devel}
 BuildRequires:	libtool
 BuildRequires:	linux-libc-headers >= 7:2.5.54
+BuildRequires:	openldap-devel
 BuildRequires:	openssl-devel >= 0.9.7d
-%{?with_radius:BuildRequires:	radius}
+BuildRequires:	pam-devel
+# http://portal-to-web.de/tacacs/libradius.php ?
+%{?with_radius:BuildRequires:	libradius-devel}
+BuildRequires:	readline-devel
 BuildRequires:	sed >= 4.0
 Requires(post,preun):	/sbin/chkconfig
 Requires:	libipsec = %{version}-%{release}
@@ -87,11 +92,12 @@ PFKeyV2 static library.
 Biblioteka statyczna PFKeyV2.
 
 %prep
-%setup -q
+%setup -q -n %{name}-%{version}-%{snap}
 %{?with_hip:%patch0 -p1}
 
 %{__sed} -i 's!@INCLUDE_GLIBC@!!g' src/Makefile.am
 %{__sed} -i 's/-Werror//' configure.ac
+%{__sed} -i 's/-R$libradius_dir\/lib//' configure.ac
 
 %build
 %{__libtoolize}
@@ -101,21 +107,25 @@ Biblioteka statyczna PFKeyV2.
 %{__automake}
 
 %configure \
-	%{?with_kerberos5:--enable-gssapi} \
-	%{?with_radius:--with-libradius} \
-	--with-kernel-headers=%{_includedir} \
-	--enable-dpd \
-	--enable-frag \
-	--enable-hybrid \
-	--enable-idea \
-	--enable-ipv6 \
-	--enable-natt \
-	--enable-natt-versions \
-	--enable-rc5 \
 	--enable-adminport \
+	--enable-rc5 \
+	--enable-idea \
+	--enable-hybrid \
+	--enable-frag \
+	%{?with_kerberos5:--enable-gssapi} \
+	--enable-stats \
+	--enable-dpd \
+	--enable-fastquit \
+	--enable-natt \
+	--enable-security-context \
+	--with-kernel-headers=%{_includedir} \
+	--with-readline \
+	%{?with_radius:--with-libradius} \
+	--with-libpam \
+	--with-libldap \
 	--enable-shared
 
-%{__make}
+%{__make} -j1
 
 %install
 rm -rf $RPM_BUILD_ROOT
