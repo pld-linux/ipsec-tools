@@ -6,16 +6,16 @@
 %bcond_with	radius		# build with radius support
 %bcond_with	hip		# build with Host Identity Protocol support
 #
-%define	snap	rc1
+#%define	snap	rc1
 Summary:	User-space IPsec tools for the Linux IPsec implementation
 Summary(pl.UTF-8):	Narzędzia przestrzeni użytkownika dla linuksowej implementacji IPsec
 Name:		ipsec-tools
 Version:	0.7
-Release:	0.%{snap}.1
+Release:	1
 License:	BSD
 Group:		Networking/Admin
-Source0:	http://dl.sourceforge.net/ipsec-tools/%{name}-%{version}-%{snap}.tar.bz2
-# Source0-md5:	511a740a4fd1f8b9d20906504567969a
+Source0:	http://dl.sourceforge.net/ipsec-tools/%{name}-%{version}.tar.bz2
+# Source0-md5:	c0a586924edde35264ecfe94ad1c261f
 Source1:	%{name}-racoon.init
 Source2:	%{name}-racoon.sysconfig
 URL:		http://ipsec-tools.sourceforge.net/
@@ -92,7 +92,7 @@ PFKeyV2 static library.
 Biblioteka statyczna PFKeyV2.
 
 %prep
-%setup -q -n %{name}-%{version}-%{snap}
+%setup -q -n %{name}-%{version}
 %{?with_hip:%patch0 -p1}
 
 %{__sed} -i 's!@INCLUDE_GLIBC@!!g' src/Makefile.am
