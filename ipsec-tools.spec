@@ -6,7 +6,6 @@
 %bcond_with	radius		# build with radius support
 %bcond_with	hip		# build with Host Identity Protocol support
 #
-#%define	snap	rc1
 Summary:	User-space IPsec tools for the Linux IPsec implementation
 Summary(pl.UTF-8):	Narzędzia przestrzeni użytkownika dla linuksowej implementacji IPsec
 Name:		ipsec-tools
@@ -92,7 +91,7 @@ PFKeyV2 static library.
 Biblioteka statyczna PFKeyV2.
 
 %prep
-%setup -q -n %{name}-%{version}
+%setup -q
 %{?with_hip:%patch0 -p1}
 
 %{__sed} -i 's!@INCLUDE_GLIBC@!!g' src/Makefile.am
