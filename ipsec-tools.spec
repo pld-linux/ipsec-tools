@@ -8,14 +8,15 @@
 Summary:	User-space IPsec tools for the Linux IPsec implementation
 Summary(pl):	Narzêdzia przestrzeni u¿ytkownika dla linuksowej implementacji IPsec
 Name:		ipsec-tools
-Version:	0.6.7
+Version:	0.7
 Release:	1
 License:	BSD
 Group:		Networking/Admin
 Source0:	http://dl.sourceforge.net/ipsec-tools/%{name}-%{version}.tar.bz2
-# Source0-md5:	4fb764f282dc21cf9a656c58e13dacbb
+# Source0-md5:	c0a586924edde35264ecfe94ad1c261f
 Source1:	%{name}-racoon.init
 Source2:	%{name}-racoon.sysconfig
+Patch0:		%{name}-selinux-check.patch
 URL:		http://ipsec-tools.sourceforge.net/
 BuildRequires:	autoconf >= 2.52
 BuildRequires:	automake
@@ -85,6 +86,7 @@ Biblioteka statyczna PFKeyV2.
 
 %prep
 %setup -q
+%patch0 -p1
 
 %{__sed} -i 's!@INCLUDE_GLIBC@!!g' src/Makefile.am
 %{__sed} -i 's!<gssapi/gssapi\.h>!"/usr/include/gssapi.h"!' src/racoon/gssapi.h
@@ -98,18 +100,21 @@ Biblioteka statyczna PFKeyV2.
 %{__automake}
 
 %configure \
-	%{?with_kerberos5:--enable-gssapi} \
-	%{?with_radius:--with-libradius} \
-	--with-kernel-headers=%{_includedir} \
-	--enable-dpd \
-	--enable-frag \
-	--enable-hybrid \
-	--enable-idea \
-	--enable-ipv6 \
-	--enable-natt \
-	--enable-natt-versions \
-	--enable-rc5 \
 	--enable-adminport \
+	--enable-rc5 \
+	--enable-idea \
+	--enable-hybrid \
+	--enable-frag \
+	%{?with_kerberos5:--enable-gssapi} \
+	--enable-stats \
+	--enable-dpd \
+	--enable-fastquit \
+	--enable-natt \
+	--with-kernel-headers=%{_includedir} \
+	--with-readline \
+	%{?with_radius:--with-libradius} \
+	--with-libpam \
+	--with-libldap \
 	--enable-shared
 
 %{__make}
