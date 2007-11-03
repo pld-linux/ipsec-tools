@@ -27,7 +27,7 @@ BuildRequires:	flex
 %{?with_kerberos5:BuildRequires:	krb5-devel}
 BuildRequires:	libtool
 BuildRequires:	linux-libc-headers >= 7:2.5.54
-BuildRequires:	openldap-devel
+BuildRequires:	openldap-devel >= 2.4.6
 BuildRequires:	openssl-devel >= 0.9.7d
 BuildRequires:	pam-devel
 # http://portal-to-web.de/tacacs/libradius.php ?
