@@ -162,7 +162,10 @@ fi
 %files
 %defattr(644,root,root,755)
 %doc NEWS README ChangeLog src/racoon/{doc,samples} src/setkey/sample*
-%attr(755,root,root) %{_sbindir}/*
+%attr(755,root,root) %{_sbindir}/plainrsa-gen
+%attr(755,root,root) %{_sbindir}/racoon
+%attr(755,root,root) %{_sbindir}/racoonctl
+%attr(755,root,root) %{_sbindir}/setkey
 %attr(754,root,root) /etc/rc.d/init.d/racoon
 %attr(750,root,root) %dir %{_sysconfdir}/racoon
 %attr(600,root,root) %{_sysconfdir}/racoon/*.txt
@@ -170,12 +173,18 @@ fi
 %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/racoon/*.conf
 %config(noreplace) %verify(not md5 mtime size) /etc/sysconfig/racoon
 %dir %{_localstatedir}/racoon
-%{_mandir}/man[58]/*
+%{_mandir}/man5/racoon.conf.5*
+%{_mandir}/man8/plainrsa-gen.8*
+%{_mandir}/man8/racoon.8*
+%{_mandir}/man8/racoonctl.8*
+%{_mandir}/man8/setkey.8*
 
 %files -n libipsec
 %defattr(644,root,root,755)
 %attr(755,root,root) %{_libdir}/libipsec.so.*.*.*
+%attr(755,root,root) %ghost %{_libdir}/libipsec.so.0
 %attr(755,root,root) %{_libdir}/libracoon.so.*.*.*
+%attr(755,root,root) %ghost %{_libdir}/libracoon.so.0
 
 %files -n libipsec-devel
 %defattr(644,root,root,755)
@@ -185,7 +194,7 @@ fi
 %{_libdir}/libracoon.la
 %{_includedir}/libipsec
 %{_includedir}/racoon
-%{_mandir}/man3/*
+%{_mandir}/man3/ipsec_*.3*
 
 %files -n libipsec-static
 %defattr(644,root,root,755)
