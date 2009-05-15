@@ -8,12 +8,12 @@
 Summary:	User-space IPsec tools for the Linux IPsec implementation
 Summary(pl):	Narzêdzia przestrzeni u¿ytkownika dla linuksowej implementacji IPsec
 Name:		ipsec-tools
-Version:	0.7.1
+Version:	0.7.2
 Release:	1
 License:	BSD
 Group:		Networking/Admin
 Source0:	http://dl.sourceforge.net/ipsec-tools/%{name}-%{version}.tar.bz2
-# Source0-md5:	30b196a2829556182c39aed9f83c0bbf
+# Source0-md5:	72861f005746ee27984b2ee715ecc629
 Source1:	%{name}-racoon.init
 Source2:	%{name}-racoon.sysconfig
 URL:		http://ipsec-tools.sourceforge.net/
@@ -166,7 +166,9 @@ fi
 %files -n libipsec
 %defattr(644,root,root,755)
 %attr(755,root,root) %{_libdir}/libipsec.so.*.*.*
+%attr(755,root,root) %ghost %{_libdir}/libipsec.so.0
 %attr(755,root,root) %{_libdir}/libracoon.so.*.*.*
+%attr(755,root,root) %ghost %{_libdir}/libracoon.so.0
 
 %files -n libipsec-devel
 %defattr(644,root,root,755)
