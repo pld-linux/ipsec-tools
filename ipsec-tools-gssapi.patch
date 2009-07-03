@@ -1,0 +1,18 @@
+--- ipsec-tools-0.7.2/src/racoon/gssapi.h~	2009-07-04 01:16:04.049366223 +0200
++++ ipsec-tools-0.7.2/src/racoon/gssapi.h	2009-07-04 01:17:57.694617899 +0200
+@@ -34,6 +34,9 @@
+  * POSSIBILITY OF SUCH DAMAGE.
+  */
+ 
++#ifndef __IPSEC_GSSAPI_H
++#define __IPSEC_GSSAPI_H
++
+ #ifdef __FreeBSD__
+ #include "/usr/include/gssapi.h"
+ #else
+@@ -89,3 +92,5 @@
+ void gssapi_free_state __P((struct ph1handle *));
+ vchar_t *gssapi_get_id __P((struct ph1handle *));
+ vchar_t *gssapi_get_default_gss_id __P((void));
++
++#endif
