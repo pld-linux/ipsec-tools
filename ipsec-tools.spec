@@ -10,7 +10,7 @@ Summary:	User-space IPsec tools for the Linux IPsec implementation
 Summary(pl.UTF-8):	Narzędzia przestrzeni użytkownika dla linuksowej implementacji IPsec
 Name:		ipsec-tools
 Version:	0.7.2
-Release:	4
+Release:	5
 License:	BSD
 Group:		Networking/Admin
 Source0:	http://dl.sourceforge.net/ipsec-tools/%{name}-%{version}.tar.bz2
@@ -21,6 +21,7 @@ URL:		http://ipsec-tools.sourceforge.net/
 # http://downloads.sourceforge.net/openhip/ipsec-tools-0.6.6-hip.patch
 Patch0:		%{name}-hip.patch
 Patch1:		%{name}-gssapi.patch
+Patch2:		%{name}-install.patch
 BuildRequires:	autoconf >= 2.52
 BuildRequires:	automake
 BuildRequires:	bison
@@ -95,6 +96,7 @@ Biblioteka statyczna PFKeyV2.
 %setup -q
 %{?with_hip:%patch0 -p1}
 %patch1 -p1
+%patch2 -p1
 
 %{__sed} -i 's!@INCLUDE_GLIBC@!!g' src/Makefile.am
 %{__sed} -i 's/-Werror//' configure.ac
