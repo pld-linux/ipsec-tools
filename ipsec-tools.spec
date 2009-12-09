@@ -27,6 +27,7 @@ BuildRequires:	automake
 BuildRequires:	bison
 BuildRequires:	flex
 %{?with_kerberos5:BuildRequires:	heimdal-devel}
+BuildRequires:	libselinux-devel
 BuildRequires:	libtool
 BuildRequires:	linux-libc-headers >= 7:2.5.54
 BuildRequires:	openldap-devel >= 2.4.6
