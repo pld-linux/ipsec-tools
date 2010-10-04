@@ -10,7 +10,7 @@ Summary:	User-space IPsec tools for the Linux IPsec implementation
 Summary(pl.UTF-8):	Narzędzia przestrzeni użytkownika dla linuksowej implementacji IPsec
 Name:		ipsec-tools
 Version:	0.7.3
-Release:	6
+Release:	7
 License:	BSD
 Group:		Networking/Admin
 Source0:	http://dl.sourceforge.net/ipsec-tools/%{name}-%{version}.tar.bz2
@@ -41,6 +41,8 @@ Requires(post,preun):	/sbin/chkconfig
 Requires:	libipsec = %{version}-%{release}
 Requires:	rc-scripts
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
+
+%define		no_install_post_check_so	1
 
 # needed to use /var/run/racoon as sockdir
 %define		_localstatedir		/var/run
