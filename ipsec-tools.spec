@@ -13,7 +13,7 @@ Version:	0.7.3
 Release:	8
 License:	BSD
 Group:		Networking/Admin
-Source0:	http://dl.sourceforge.net/ipsec-tools/%{name}-%{version}.tar.bz2
+Source0:	http://downloads.sourceforge.net/ipsec-tools/%{name}-%{version}.tar.bz2
 # Source0-md5:	821bd84e8d4ad5a93bf594b8b3d66e1e
 Source1:	%{name}-racoon.init
 Source2:	%{name}-racoon.sysconfig
