@@ -9,19 +9,18 @@
 Summary:	User-space IPsec tools for the Linux IPsec implementation
 Summary(pl.UTF-8):	Narzędzia przestrzeni użytkownika dla linuksowej implementacji IPsec
 Name:		ipsec-tools
-Version:	0.7.3
-Release:	8
+Version:	0.8.0
+Release:	1
 License:	BSD
 Group:		Networking/Admin
 Source0:	http://downloads.sourceforge.net/ipsec-tools/%{name}-%{version}.tar.bz2
-# Source0-md5:	821bd84e8d4ad5a93bf594b8b3d66e1e
+# Source0-md5:	b79aae3055a51f8de5c0f1b8ca6cf619
 Source1:	%{name}-racoon.init
 Source2:	%{name}-racoon.sysconfig
 URL:		http://ipsec-tools.sourceforge.net/
 # http://downloads.sourceforge.net/openhip/ipsec-tools-0.6.6-hip.patch
 Patch0:		%{name}-hip.patch
 Patch1:		%{name}-gssapi.patch
-Patch2:		%{name}-install.patch
 BuildRequires:	autoconf >= 2.52
 BuildRequires:	automake
 BuildRequires:	bison
@@ -29,7 +28,7 @@ BuildRequires:	flex
 %{?with_kerberos5:BuildRequires:	heimdal-devel}
 BuildRequires:	libselinux-devel
 BuildRequires:	libtool
-BuildRequires:	linux-libc-headers >= 7:2.5.54
+BuildRequires:	linux-libc-headers >= 7:2.6
 BuildRequires:	openldap-devel >= 2.4.6
 BuildRequires:	openssl-devel >= 0.9.7d
 BuildRequires:	pam-devel
@@ -61,49 +60,48 @@ do polityki bezpieczeństwa oraz asocjacyjnej bazy danych
 bezpieczeństwa.
 
 %package -n libipsec
-Summary:	PFKeyV2 library
-Summary(pl.UTF-8):	Biblioteka PFKeyV2
+Summary:	Shared libipsec and libracoon libraries
+Summary(pl.UTF-8):	Biblioteki współdzielone libipsec i libracoon
 Group:		Libraries
 
 %description -n libipsec
-PFKeyV2 library.
+Shared libipsec and libracoon libraries.
 
 %description -n libipsec -l pl.UTF-8
-Biblioteka PFKeyV2.
+Biblioteki współdzielone libipsec i libracoon.
 
 %package -n libipsec-devel
-Summary:	PFKeyV2 library - development files
-Summary(pl.UTF-8):	Pliki nagłówkowe biblioteki PFKeyV2
+Summary:	Header files for libipsec and racoon libraries
+Summary(pl.UTF-8):	Pliki nagłówkowe bibliotek libipsec i racoon
 Group:		Development/Libraries
 Requires:	libipsec = %{version}-%{release}
 
 %description -n libipsec-devel
-PFKeyV2 library - development files.
+Header files for libipsec and racoon libraries.
 
 %description -n libipsec-devel -l pl.UTF-8
-Pliki nagłówkowe biblioteki PFKeyV2.
+Pliki nagłówkowe bibliotek libipsec i racoon.
 
 %package -n libipsec-static
-Summary:	PFKeyV2 static library
-Summary(pl.UTF-8):	Biblioteka statyczna PFKeyV2
+Summary:	Static libipsec and libracoon libraries
+Summary(pl.UTF-8):	Biblioteki statyczne libipsec i libracoon
 Group:		Development/Libraries
 Requires:	libipsec-devel = %{version}-%{release}
 
 %description -n libipsec-static
-PFKeyV2 static library.
+Static libipsec and libracoon libraries.
 
 %description -n libipsec-static -l pl.UTF-8
-Biblioteka statyczna PFKeyV2.
+Biblioteki statyczne libipsec i libracoon.
 
 %prep
 %setup -q
 %{?with_hip:%patch0 -p1}
 %patch1 -p1
-%patch2 -p1
 
 %{__sed} -i 's!@INCLUDE_GLIBC@!!g' src/Makefile.am
 %{__sed} -i 's/-Werror//' configure.ac
-%{__sed} -i 's/-R$libradius_dir\/lib//' configure.ac
+%{__sed} -i 's/-R\$[^ ]*\/lib//' configure.ac
 
 %build
 %{__libtoolize}
@@ -121,7 +119,6 @@ Biblioteka statyczna PFKeyV2.
 	%{?with_kerberos5:--enable-gssapi} \
 	--enable-stats \
 	--enable-dpd \
-	--enable-fastquit \
 	--enable-natt \
 	--enable-security-context \
 	--with-kernel-headers=%{_includedir} \
