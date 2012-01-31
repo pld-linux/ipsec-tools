@@ -17,6 +17,7 @@ Source0:	http://downloads.sourceforge.net/ipsec-tools/%{name}-%{version}.tar.bz2
 # Source0-md5:	b79aae3055a51f8de5c0f1b8ca6cf619
 Source1:	%{name}-racoon.init
 Source2:	%{name}-racoon.sysconfig
+Source3:	%{name}.tmpfiles
 URL:		http://ipsec-tools.sourceforge.net/
 # http://downloads.sourceforge.net/openhip/ipsec-tools-0.6.6-hip.patch
 Patch0:		%{name}-hip.patch
@@ -132,13 +133,15 @@ Biblioteki statyczne libipsec i libracoon.
 
 %install
 rm -rf $RPM_BUILD_ROOT
-install -d $RPM_BUILD_ROOT/etc/{rc.d/init.d,racoon,sysconfig}
+install -d $RPM_BUILD_ROOT/etc/{rc.d/init.d,racoon,sysconfig} \
+	$RPM_BUILD_ROOT/usr/lib/tmpfiles.d
 
 %{__make} -j1 install \
 	DESTDIR=$RPM_BUILD_ROOT
 
 install %{SOURCE1} $RPM_BUILD_ROOT/etc/rc.d/init.d/racoon
 install %{SOURCE2} $RPM_BUILD_ROOT/etc/sysconfig/racoon
+install %{SOURCE3} $RPM_BUILD_ROOT/usr/lib/tmpfiles.d/%{name}.conf
 install src/racoon/samples/*.txt src/racoon/samples/*.conf $RPM_BUILD_ROOT%{_sysconfdir}/racoon
 
 %clean
@@ -176,6 +179,7 @@ fi
 %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/racoon/*.txt
 %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/racoon/*.conf
 %config(noreplace) %verify(not md5 mtime size) /etc/sysconfig/racoon
+/usr/lib/tmpfiles.d/%{name}.conf
 %dir %{_localstatedir}/racoon
 %{_mandir}/man5/racoon.conf.5*
 %{_mandir}/man8/plainrsa-gen.8*
