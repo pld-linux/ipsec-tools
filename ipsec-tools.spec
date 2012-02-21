@@ -3,6 +3,7 @@
 #
 # Conditional build:
 %bcond_without	kerberos5	# build with GSSAPI support
+%bcond_without	ldap		# build with LDAP support
 %bcond_with	radius		# build with radius support
 %bcond_with	hip		# build with Host Identity Protocol support
 #
@@ -30,7 +31,7 @@ BuildRequires:	flex
 BuildRequires:	libselinux-devel
 BuildRequires:	libtool
 BuildRequires:	linux-libc-headers >= 7:2.6
-BuildRequires:	openldap-devel >= 2.4.6
+%{?with_ldap:BuildRequires:	openldap-devel >= 2.4.6}
 BuildRequires:	openssl-devel >= 0.9.7d
 BuildRequires:	pam-devel
 # http://portal-to-web.de/tacacs/libradius.php ?
@@ -126,7 +127,7 @@ Biblioteki statyczne libipsec i libracoon.
 	--with-readline \
 	%{?with_radius:--with-libradius} \
 	--with-libpam \
-	--with-libldap \
+	--with%{!?with_ldap:out}-libldap \
 	--enable-shared
 
 %{__make} -j1
