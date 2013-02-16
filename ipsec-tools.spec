@@ -176,7 +176,6 @@ fi
 %attr(755,root,root) %{_sbindir}/setkey
 %attr(754,root,root) /etc/rc.d/init.d/racoon
 %attr(750,root,root) %dir %{_sysconfdir}/racoon
-%attr(600,root,root) %{_sysconfdir}/racoon/*.txt
 %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/racoon/*.txt
 %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/racoon/*.conf
 %config(noreplace) %verify(not md5 mtime size) /etc/sysconfig/racoon
