@@ -1,6 +1,16 @@
 # TODO
 # - make --with-libradius compile
 #
+# - Fix missing symbols from libipsec like:
+# Searching for shared objects with unresolved symbols...
+# Unresolved symbols found in: /home/users/matkor/tmp/ipsec-tools-0.8.2-root-matkor/usr/lib64/libracoon.so.0.0.0
+#         ipsec_get_policylen
+#         adminsock_path
+#         ipsec_set_policy
+#         ipsec_strerror
+#	?
+
+
 # Conditional build:
 %bcond_without	kerberos5	# build with GSSAPI support
 %bcond_without	ldap		# build with LDAP support
@@ -10,12 +20,12 @@
 Summary:	User-space IPsec tools for the Linux IPsec implementation
 Summary(pl.UTF-8):	Narzędzia przestrzeni użytkownika dla linuksowej implementacji IPsec
 Name:		ipsec-tools
-Version:	0.8.0
-Release:	3
+Version:	0.8.2
+Release:	0.1
 License:	BSD
 Group:		Networking/Admin
 Source0:	http://downloads.sourceforge.net/ipsec-tools/%{name}-%{version}.tar.bz2
-# Source0-md5:	b79aae3055a51f8de5c0f1b8ca6cf619
+# Source0-md5:	d53ec14a0a3ece64e09e5e34b3350b41
 Source1:	%{name}-racoon.init
 Source2:	%{name}-racoon.sysconfig
 Source3:	%{name}.tmpfiles
@@ -23,6 +33,7 @@ URL:		http://ipsec-tools.sourceforge.net/
 # http://downloads.sourceforge.net/openhip/ipsec-tools-0.6.6-hip.patch
 Patch0:		%{name}-hip.patch
 Patch1:		%{name}-gssapi.patch
+Patch2:		%{name}-support-glibc-2.20.patch
 BuildRequires:	autoconf >= 2.52
 BuildRequires:	automake
 BuildRequires:	bison
@@ -100,6 +111,7 @@ Biblioteki statyczne libipsec i libracoon.
 %setup -q
 %{?with_hip:%patch0 -p1}
 %patch1 -p1
+%patch2 -p1
 
 %{__sed} -i 's!@INCLUDE_GLIBC@!!g' src/Makefile.am
 %{__sed} -i 's/-Werror//' configure.ac

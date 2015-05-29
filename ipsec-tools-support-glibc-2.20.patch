@@ -1,0 +1,10 @@
+--- ipsec-tools-0.8.2.org/src/include-glibc/glibc-bugs.h
++++ ipsec-tools-0.8.2/src/include-glibc/glibc-bugs.h
+@@ -4,6 +4,7 @@
+ 
+ #define _XOPEN_SOURCE 500
+ #define _BSD_SOURCE
++#define _DEFAULT_SOURCE
+ 
+ #include <features.h>
+ #include <sys/types.h>
