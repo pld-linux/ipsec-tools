@@ -1,15 +1,6 @@
 # TODO
 # - make --with-libradius compile
 #
-# - Fix missing symbols from libipsec like:
-# Searching for shared objects with unresolved symbols...
-# Unresolved symbols found in: /home/users/matkor/tmp/ipsec-tools-0.8.2-root-matkor/usr/lib64/libracoon.so.0.0.0
-#         ipsec_get_policylen
-#         adminsock_path
-#         ipsec_set_policy
-#         ipsec_strerror
-#	?
-
 
 # Conditional build:
 %bcond_without	kerberos5	# build with GSSAPI support
@@ -34,6 +25,7 @@ URL:		http://ipsec-tools.sourceforge.net/
 Patch0:		%{name}-hip.patch
 Patch1:		%{name}-gssapi.patch
 Patch2:		%{name}-support-glibc-2.20.patch
+Patch3:		%{name}-link.patch
 BuildRequires:	autoconf >= 2.52
 BuildRequires:	automake
 BuildRequires:	bison
@@ -43,7 +35,7 @@ BuildRequires:	libselinux-devel
 BuildRequires:	libtool
 BuildRequires:	linux-libc-headers >= 7:2.6
 %{?with_ldap:BuildRequires:	openldap-devel >= 2.4.6}
-BuildRequires:	openssl-devel >= 0.9.7d
+BuildRequires:	openssl-devel >= 0.9.8s
 BuildRequires:	pam-devel
 # http://portal-to-web.de/tacacs/libradius.php ?
 %{?with_radius:BuildRequires:	libradius-devel}
@@ -54,7 +46,8 @@ Requires:	libipsec = %{version}-%{release}
 Requires:	rc-scripts
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 
-%define		no_install_post_check_so	1
+# requires adminsock_path symbol from binary
+%define		skip_post_check_so	libracoon.so.*
 
 # needed to use /var/run/racoon as sockdir
 %define		_localstatedir		/var/run
@@ -112,6 +105,7 @@ Biblioteki statyczne libipsec i libracoon.
 %{?with_hip:%patch0 -p1}
 %patch1 -p1
 %patch2 -p1
+%patch3 -p1
 
 %{__sed} -i 's!@INCLUDE_GLIBC@!!g' src/Makefile.am
 %{__sed} -i 's/-Werror//' configure.ac
@@ -126,21 +120,21 @@ Biblioteki statyczne libipsec i libracoon.
 
 %configure \
 	--enable-adminport \
-	--enable-rc5 \
-	--enable-idea \
-	--enable-hybrid \
+	--enable-dpd \
 	--enable-frag \
 	%{?with_kerberos5:--enable-gssapi} \
-	--enable-stats \
-	--enable-dpd \
+	--enable-hybrid \
+	--enable-idea \
 	--enable-natt \
+	--enable-rc5 \
 	--enable-security-context \
+	--enable-shared \
+	--enable-stats \
 	--with-kernel-headers=%{_includedir} \
-	--with-readline \
-	%{?with_radius:--with-libradius} \
+	--with-libldap%{!?with_ldap:=no} \
 	--with-libpam \
-	--with%{!?with_ldap:out}-libldap \
-	--enable-shared
+	%{?with_radius:--with-libradius} \
+	--with-readline
 
 %{__make} -j1
 

@@ -1,0 +1,10 @@
+--- ipsec-tools-0.8.2/src/racoon/Makefile.am.orig	2009-12-11 10:04:04.000000000 +0100
++++ ipsec-tools-0.8.2/src/racoon/Makefile.am	2015-07-04 17:02:44.591204074 +0200
+@@ -49,6 +49,7 @@
+ 
+ libracoon_la_SOURCES = kmpstat.c vmbuf.c sockmisc.c misc.c
+ libracoon_la_CFLAGS = -DNOUSE_PRIVSEP $(AM_CFLAGS)
++libracoon_la_LIBADD = ../libipsec/libipsec.la
+ 
+ plainrsa_gen_SOURCES = plainrsa-gen.c plog.c \
+ 	crypto_openssl.c logger.c 
