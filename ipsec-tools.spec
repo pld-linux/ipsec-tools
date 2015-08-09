@@ -26,6 +26,7 @@ Patch0:		%{name}-hip.patch
 Patch1:		%{name}-gssapi.patch
 Patch2:		%{name}-support-glibc-2.20.patch
 Patch3:		%{name}-link.patch
+Patch4:		no-sysctl.patch
 BuildRequires:	autoconf >= 2.52
 BuildRequires:	automake
 BuildRequires:	bison
@@ -106,6 +107,7 @@ Biblioteki statyczne libipsec i libracoon.
 %patch1 -p1
 %patch2 -p1
 %patch3 -p1
+%patch4 -p1
 
 %{__sed} -i 's!@INCLUDE_GLIBC@!!g' src/Makefile.am
 %{__sed} -i 's/-Werror//' configure.ac
