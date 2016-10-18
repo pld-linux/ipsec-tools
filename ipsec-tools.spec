@@ -12,7 +12,7 @@ Summary:	User-space IPsec tools for the Linux IPsec implementation
 Summary(pl.UTF-8):	Narzędzia przestrzeni użytkownika dla linuksowej implementacji IPsec
 Name:		ipsec-tools
 Version:	0.8.2
-Release:	1
+Release:	2
 License:	BSD
 Group:		Networking/Admin
 Source0:	http://downloads.sourceforge.net/ipsec-tools/%{name}-%{version}.tar.bz2
