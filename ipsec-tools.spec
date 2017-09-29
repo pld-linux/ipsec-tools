@@ -12,7 +12,7 @@ Summary:	User-space IPsec tools for the Linux IPsec implementation
 Summary(pl.UTF-8):	Narzędzia przestrzeni użytkownika dla linuksowej implementacji IPsec
 Name:		ipsec-tools
 Version:	0.8.2
-Release:	2
+Release:	3
 License:	BSD
 Group:		Networking/Admin
 Source0:	http://downloads.sourceforge.net/ipsec-tools/%{name}-%{version}.tar.bz2
@@ -153,6 +153,8 @@ install %{SOURCE2} $RPM_BUILD_ROOT/etc/sysconfig/racoon
 install %{SOURCE3} $RPM_BUILD_ROOT/usr/lib/tmpfiles.d/%{name}.conf
 install src/racoon/samples/*.txt src/racoon/samples/*.conf $RPM_BUILD_ROOT%{_sysconfdir}/racoon
 
+%{__rm} $RPM_BUILD_ROOT%{_libdir}/lib*.la
+
 %clean
 rm -rf $RPM_BUILD_ROOT
 
@@ -184,7 +186,7 @@ fi
 %attr(755,root,root) %{_sbindir}/setkey
 %attr(754,root,root) /etc/rc.d/init.d/racoon
 %attr(750,root,root) %dir %{_sysconfdir}/racoon
-%config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/racoon/*.txt
+%config(noreplace) %verify(not md5 mtime size) %attr(600,root,root) %{_sysconfdir}/racoon/*.txt
 %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/racoon/*.conf
 %config(noreplace) %verify(not md5 mtime size) /etc/sysconfig/racoon
 /usr/lib/tmpfiles.d/%{name}.conf
@@ -206,8 +208,6 @@ fi
 %defattr(644,root,root,755)
 %attr(755,root,root) %{_libdir}/libipsec.so
 %attr(755,root,root) %{_libdir}/libracoon.so
-%{_libdir}/libipsec.la
-%{_libdir}/libracoon.la
 %{_includedir}/libipsec
 %{_includedir}/racoon
 %{_mandir}/man3/ipsec_*.3*
