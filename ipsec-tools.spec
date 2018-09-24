@@ -12,7 +12,7 @@ Summary:	User-space IPsec tools for the Linux IPsec implementation
 Summary(pl.UTF-8):	Narzędzia przestrzeni użytkownika dla linuksowej implementacji IPsec
 Name:		ipsec-tools
 Version:	0.8.2
-Release:	4
+Release:	5
 License:	BSD
 Group:		Networking/Admin
 Source0:	http://downloads.sourceforge.net/ipsec-tools/%{name}-%{version}.tar.bz2
@@ -27,6 +27,7 @@ Patch1:		%{name}-gssapi.patch
 Patch2:		%{name}-support-glibc-2.20.patch
 Patch3:		%{name}-link.patch
 Patch4:		no-sysctl.patch
+Patch5:		%{name}-openssl-1.1.patch
 BuildRequires:	autoconf >= 2.52
 BuildRequires:	automake
 BuildRequires:	bison
@@ -108,6 +109,7 @@ Biblioteki statyczne libipsec i libracoon.
 %patch2 -p1
 %patch3 -p1
 %patch4 -p1
+%patch5 -p1
 
 %{__sed} -i 's!@INCLUDE_GLIBC@!!g' src/Makefile.am
 %{__sed} -i 's/-Werror//' configure.ac
