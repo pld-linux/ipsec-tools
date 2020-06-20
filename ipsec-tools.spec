@@ -3,10 +3,10 @@
 #
 
 # Conditional build:
-%bcond_without	kerberos5	# build with GSSAPI support
-%bcond_without	ldap		# build with LDAP support
-%bcond_with	radius		# build with radius support
-%bcond_with	hip		# build with Host Identity Protocol support
+%bcond_without	kerberos5	# GSSAPI support
+%bcond_without	ldap		# LDAP support
+%bcond_with	radius		# RADIUS support
+%bcond_with	hip		# Host Identity Protocol support
 #
 Summary:	User-space IPsec tools for the Linux IPsec implementation
 Summary(pl.UTF-8):	Narzędzia przestrzeni użytkownika dla linuksowej implementacji IPsec
@@ -28,6 +28,7 @@ Patch2:		%{name}-support-glibc-2.20.patch
 Patch3:		%{name}-link.patch
 Patch4:		no-sysctl.patch
 Patch5:		%{name}-openssl-1.1.patch
+Patch6:		%{name}-libdir.patch
 BuildRequires:	autoconf >= 2.52
 BuildRequires:	automake
 BuildRequires:	bison
@@ -39,8 +40,7 @@ BuildRequires:	linux-libc-headers >= 7:2.6
 %{?with_ldap:BuildRequires:	openldap-devel >= 2.4.6}
 BuildRequires:	openssl-devel >= 0.9.8s
 BuildRequires:	pam-devel
-# http://portal-to-web.de/tacacs/libradius.php ?
-%{?with_radius:BuildRequires:	libradius-devel}
+%{?with_radius:BuildRequires:	libradius-linux-devel}
 BuildRequires:	readline-devel
 BuildRequires:	sed >= 4.0
 Requires(post,preun):	/sbin/chkconfig
@@ -110,10 +110,10 @@ Biblioteki statyczne libipsec i libracoon.
 %patch3 -p1
 %patch4 -p1
 %patch5 -p1
+%patch6 -p1
 
 %{__sed} -i 's!@INCLUDE_GLIBC@!!g' src/Makefile.am
 %{__sed} -i 's/-Werror//' configure.ac
-%{__sed} -i 's/-R\$[^ ]*\/lib//' configure.ac
 
 %build
 %{__libtoolize}
@@ -121,7 +121,6 @@ Biblioteki statyczne libipsec i libracoon.
 %{__autoconf}
 %{__autoheader}
 %{__automake}
-
 %configure \
 	--enable-adminport \
 	--enable-dpd \

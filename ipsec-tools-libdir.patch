@@ -1,0 +1,77 @@
+--- ipsec-tools-0.8.2/configure.ac.orig	2014-02-27 09:44:18.000000000 +0100
++++ ipsec-tools-0.8.2/configure.ac	2020-06-20 22:20:33.797188479 +0200
+@@ -305,6 +305,7 @@
+ 	fi;
+ 	if test "x$libiconv_dir" = "x"; then
+ 		RACOON_PATH_LIBS([iconv_open], [iconv])
++		LIBS="$LIBS -liconv"
+ 	else
+ 		if test -d "$libiconv_dir/lib" -a \
+ 		    -d "$libiconv_dir/include" ; then
+@@ -313,8 +314,8 @@
+ 		else
+ 			AC_MSG_ERROR([ICONV libs or includes not found. Aborting.])
+ 	  	fi
++		LIBS="$LIBS -L$libiconv_dir/lib -liconv"
+ 	fi
+-	LIBS="$LIBS -L$libiconv_dir/lib -R$libiconv_dir/lib -liconv"
+ 	AC_CHECK_FUNCS(iconv_open)
+ fi
+ 
+@@ -368,6 +369,7 @@
+ 	fi;
+ 	if test "x$libradius_dir" = "x"; then
+ 		RACOON_PATH_LIBS([rad_create_request], [radius])
++		LIBS="$LIBS -lradius"
+ 	else
+ 		if test -d "$libradius_dir/lib" -a \
+ 		    -d "$libradius_dir/include" ; then
+@@ -376,9 +378,9 @@
+ 		else
+ 			AC_MSG_ERROR([RADIUS libs or includes not found. Aborting.])
+ 	  	fi
++		LIBS="$LIBS -L$libradius_dir/lib -lradius"
+ 	fi
+ 	AC_DEFINE([HAVE_LIBRADIUS], [], [Hybrid authentication uses RADIUS])
+-	LIBS="$LIBS -L$libradius_dir/lib -R$libradius_dir/lib -lradius"
+ 	AC_CHECK_FUNCS(rad_create_request)
+ fi
+ 
+@@ -394,6 +396,7 @@
+ 	fi;
+ 	if test "x$libpam_dir" = "x"; then
+ 		RACOON_PATH_LIBS([pam_start], [pam])
++		LIBS="$LIBS -lpam"
+ 	else
+ 		if test -d "$libpam_dir/lib" -a \
+ 		    -d "$libpam_dir/include" ; then
+@@ -402,9 +405,9 @@
+ 		else
+ 			AC_MSG_ERROR([PAM libs or includes not found. Aborting.])
+ 	  	fi
++		LIBS="$LIBS -L$libpam_dir/lib -lpam"
+ 	fi
+ 	AC_DEFINE([HAVE_LIBPAM], [], [Hybrid authentication uses PAM])
+-	LIBS="$LIBS -L$libpam_dir/lib -R$libpam_dir/lib -lpam"
+ 	AC_CHECK_FUNCS(pam_start)
+ fi
+ 
+@@ -420,6 +423,7 @@
+ 	fi;
+ 	if test "x$libldap_dir" = "x"; then
+ 		RACOON_PATH_LIBS([ldap_init], [ldap])
++		LIBS="$LIBS -lldap"
+ 	else
+ 		if test -d "$libldap_dir/lib" -a \
+ 		    -d "$libldap_dir/include" ; then
+@@ -428,9 +432,9 @@
+ 		else
+ 			AC_MSG_ERROR([LDAP libs or includes not found. Aborting.])
+ 	  	fi
++		LIBS="$LIBS -L$libldap_dir/lib -lldap"
+ 	fi
+ 	AC_DEFINE([HAVE_LIBLDAP], [], [Hybrid authentication uses LDAP])
+-	LIBS="$LIBS -L$libldap_dir/lib -R$libldap_dir/lib -lldap"
+ 
+ 	saved_CFLAGS=$CFLAGS
+ 	CFLAGS="$CFLAGS -Wall -Werror"
